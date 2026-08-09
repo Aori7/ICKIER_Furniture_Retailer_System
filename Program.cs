@@ -14,7 +14,7 @@ namespace ICKIER_Furniture_Retailer_System
         static void Main(string[] args)
         {
             Console.WriteLine("=== ICKIER Furniture Retailer ===");
-            Console.WriteLine("Payment Testing");
+            Console.WriteLine("Payment");
             Console.WriteLine();
 
             Payment payment = new Payment(1, 250.00m);
@@ -68,7 +68,7 @@ namespace ICKIER_Furniture_Retailer_System
                 Console.WriteLine("Payment process completed.");
 
                 Console.WriteLine();
-                Console.Write("Test refund? (Y/N): ");
+                Console.Write("Request refund? (Y/N): ");
                 string refundChoice = Console.ReadLine();
 
                 if (refundChoice.Equals("Y", StringComparison.OrdinalIgnoreCase))
@@ -84,7 +84,7 @@ namespace ICKIER_Furniture_Retailer_System
 
             Console.WriteLine();
             Console.WriteLine("================================");
-            Console.WriteLine("       OBSERVER PATTERN TEST");
+            Console.WriteLine("       BRAND PROMOTIONS");
             Console.WriteLine("================================");
             Console.WriteLine();
 
@@ -123,7 +123,7 @@ namespace ICKIER_Furniture_Retailer_System
             customer.ViewNotifications();
 
             Console.WriteLine();
-            Console.WriteLine("--- Testing Unsubscribe ---");
+            Console.WriteLine("--- Unsubscribe from Brand ---");
 
             // Customer unsubscribes
             customer.UnsubscribeFromBrand(brand);

@@ -11,7 +11,7 @@ namespace ICKIER_Furniture_Retailer_System
         public string Name { get; set; }
         public string Email { get; set; }
 
-        private List<Notification> notifications;
+        private readonly List<Notification> notifications;
 
         public Customer(int customerId, string name, string email)
         {
@@ -23,20 +23,14 @@ namespace ICKIER_Furniture_Retailer_System
 
         public void SubscribeToBrand(Brand brand)
         {
+            Console.WriteLine($"{Name} subscribing to {brand.BrandName}...");
             brand.Subscribe(this);
-
-            Console.WriteLine(
-                $"{Name} subscribed to {brand.BrandName}."
-            );
         }
 
         public void UnsubscribeFromBrand(Brand brand)
         {
+            Console.WriteLine($"{Name} unsubscribing from {brand.BrandName}...");
             brand.Unsubscribe(this);
-
-            Console.WriteLine(
-                $"{Name} unsubscribed from {brand.BrandName}."
-            );
         }
 
         public void Update(Promotion promotion)

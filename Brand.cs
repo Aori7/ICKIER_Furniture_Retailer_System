@@ -10,8 +10,8 @@ namespace ICKIER_Furniture_Retailer_System
         public int BrandId { get; set; }
         public string BrandName { get; set; }
 
-        private List<IBrandObserver> observers;
-        private List<Promotion> promotions;
+        private readonly List<IBrandObserver> observers;
+        private readonly List<Promotion> promotions;
 
         public Brand(int brandId, string brandName)
         {
@@ -27,12 +27,25 @@ namespace ICKIER_Furniture_Retailer_System
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
+                Console.WriteLine("Subscription successful.");
+            }
+            else
+            {
+                Console.WriteLine("You are already subscribed to this brand.");
             }
         }
 
         public void Unsubscribe(IBrandObserver observer)
         {
-            observers.Remove(observer);
+            if (observers.Contains(observer))
+            {
+                observers.Remove(observer);
+                Console.WriteLine("Unsubscription successful.");
+            }
+            else
+            {
+                Console.WriteLine("You are not subscribed to this brand.");
+            }
         }
 
         public void NotifyObservers(Promotion promotion)
@@ -45,6 +58,12 @@ namespace ICKIER_Furniture_Retailer_System
 
         public void AddPromotion(Promotion promotion)
         {
+            if (!promotion.IsActive())
+            {
+                Console.WriteLine("Promotion is not active and cannot be sent to subscribers.");
+                return;
+            }
+
             promotions.Add(promotion);
 
             Console.WriteLine(
