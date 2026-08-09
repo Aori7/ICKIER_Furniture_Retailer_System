@@ -66,12 +66,85 @@ namespace ICKIER_Furniture_Retailer_System
             {
                 Console.WriteLine();
                 Console.WriteLine("Payment process completed.");
+
+                Console.WriteLine();
+                Console.Write("Test refund? (Y/N): ");
+                string refundChoice = Console.ReadLine();
+
+                if (refundChoice.Equals("Y", StringComparison.OrdinalIgnoreCase))
+                {
+                    payment.RefundPayment();
+                }
             }
             else
             {
                 Console.WriteLine();
                 Console.WriteLine("Payment was unsuccessful.");
             }
+
+            Console.WriteLine();
+            Console.WriteLine("================================");
+            Console.WriteLine("       OBSERVER PATTERN TEST");
+            Console.WriteLine("================================");
+            Console.WriteLine();
+
+            // Create a customer
+            Customer customer = new Customer(
+                1,
+                "Zi Ying",
+                "ziying@email.com"
+            );
+
+            // Create a brand
+            Brand brand = new Brand(
+                1,
+                "ICKIER Home"
+            );
+
+            // Customer subscribes to the brand
+            customer.SubscribeToBrand(brand);
+
+            Console.WriteLine();
+
+            // Create a promotion
+            Promotion promotion = new Promotion(
+                1,
+                "National Day Sale",
+                "Enjoy special discounts on selected furniture.",
+                20m,
+                DateTime.Now.AddDays(-1),
+                DateTime.Now.AddDays(7)
+            );
+
+            // Brand publishes the promotion
+            brand.AddPromotion(promotion);
+
+            // Customer views the notification
+            customer.ViewNotifications();
+
+            Console.WriteLine();
+            Console.WriteLine("--- Testing Unsubscribe ---");
+
+            // Customer unsubscribes
+            customer.UnsubscribeFromBrand(brand);
+
+            // Create another promotion
+            Promotion secondPromotion = new Promotion(
+                2,
+                "Weekend Sale",
+                "Extra savings this weekend.",
+                10m,
+                DateTime.Now,
+                DateTime.Now.AddDays(2)
+            );
+
+            // Brand publishes another promotion
+            brand.AddPromotion(secondPromotion);
+
+            Console.WriteLine();
+
+            // Check the customer's notifications again
+            customer.ViewNotifications();
         }
     }
 }
