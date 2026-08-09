@@ -16,6 +16,14 @@ namespace ICKIER_Furniture_Retailer_System
 
         public bool Pay(decimal amount)
         {
+            if (string.IsNullOrWhiteSpace(Email) ||
+                !Email.Contains("@") ||
+                !Email.Contains("."))
+            {
+                Console.WriteLine("Invalid PayPal email address.");
+                return false;
+            }
+
             Console.WriteLine($"Processing PayPal payment of ${amount:F2}...");
             Console.WriteLine("PayPal payment successful.");
             return true;

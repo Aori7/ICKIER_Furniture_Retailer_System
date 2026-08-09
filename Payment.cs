@@ -10,6 +10,8 @@ namespace ICKIER_Furniture_Retailer_System
         public int PaymentId { get; set; }
         public decimal Amount { get; set; }
         public DateTime PaymentDate { get; set; }
+        public bool IsPaid { get; private set; }
+        public bool IsRefunded { get; private set; }
 
         private IPaymentStrategy paymentStrategy;
 
@@ -18,6 +20,8 @@ namespace ICKIER_Furniture_Retailer_System
             PaymentId = paymentId;
             Amount = amount;
             PaymentDate = DateTime.Now;
+            IsPaid = false;
+            IsRefunded = false;
         }
 
         public void SetPaymentStrategy(IPaymentStrategy strategy)
@@ -27,24 +31,50 @@ namespace ICKIER_Furniture_Retailer_System
 
         public bool ProcessPayment()
         {
+            if (Amount <= 0)
+            {
+                Console.WriteLine("Payment amount must be greater than $0.");
+                return false;
+            }
+
             if (paymentStrategy == null)
             {
                 Console.WriteLine("Please select a payment method.");
                 return false;
             }
 
-            return paymentStrategy.Pay(Amount);
+            bool successful = paymentStrategy.Pay(Amount);
+
+            if (successful)
+            {
+                IsPaid = true;
+            }
+
+            return successful;
         }
 
         public bool RefundPayment()
         {
-            if (paymentStrategy == null)
+            if (!IsPaid)
             {
-                Console.WriteLine("No payment method found for refund.");
+                Console.WriteLine("Refund cannot be processed because payment has not been completed.");
                 return false;
             }
 
-            return paymentStrategy.Refund(Amount);
+            if (IsRefunded)
+            {
+                Console.WriteLine("This payment has already been refunded.");
+                return false;
+            }
+
+            bool successful = paymentStrategy.Refund(Amount);
+
+            if (successful)
+            {
+                IsRefunded = true;
+            }
+
+            return successful;
         }
     }
 }
