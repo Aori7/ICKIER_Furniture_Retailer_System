@@ -12,9 +12,40 @@ namespace ICKIER_Furniture_Retailer_System
         public override void PlaceOrder() { Console.WriteLine("Order already placed, awaiting payment."); }
         public override void MakePayment()
         {
-            Console.WriteLine($"Order {order.OrderId}: Payment successful. Preparing order...");
-            order.Status = "Preparing";
-            order.SetState(order.PreparingState);
+            if (order.Payment == null)
+            {
+                Console.WriteLine(
+                    $"Order {order.OrderId}: No payment method selected."
+                );
+                return;
+            }
+
+            if (order.Payment.IsCashOnDelivery)
+            {
+                Console.WriteLine(
+                    $"Order {order.OrderId}: Cash on Delivery confirmed. Preparing order..."
+                );
+
+                order.Status = "Preparing";
+                order.SetState(order.PreparingState);
+                return;
+            }
+
+            if (order.Payment.IsPaid)
+            {
+                Console.WriteLine(
+                    $"Order {order.OrderId}: Payment successful. Preparing order..."
+                );
+
+                order.Status = "Preparing";
+                order.SetState(order.PreparingState);
+            }
+            else
+            {
+                Console.WriteLine(
+                    $"Order {order.OrderId}: Payment has not been completed."
+                );
+            }
         }
         public override void CancelOrder()
         {
