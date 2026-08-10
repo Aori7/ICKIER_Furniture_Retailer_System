@@ -13,7 +13,15 @@ namespace ICKIER_Furniture_Retailer_System
         public bool IsPaid { get; private set; }
         public bool IsRefunded { get; private set; }
 
-        private IPaymentStrategy paymentStrategy;
+        private IPaymentStrategy? paymentStrategy;
+
+        public bool IsCashOnDelivery
+        {
+            get
+            {
+                return paymentStrategy is CashOnDeliveryPayment;
+            }
+        }
 
         public Payment(int paymentId, decimal amount)
         {
@@ -71,6 +79,12 @@ namespace ICKIER_Furniture_Retailer_System
             if (IsRefunded)
             {
                 Console.WriteLine("This payment has already been refunded.");
+                return false;
+            }
+
+            if (paymentStrategy == null)
+            {
+                Console.WriteLine("No payment strategy has been selected.");
                 return false;
             }
 
