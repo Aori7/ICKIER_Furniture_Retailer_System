@@ -12,15 +12,34 @@ List<(FurnitureItem item, int qty)> lastOrderItems =
     new List<(FurnitureItem item, int qty)>();
 int orderCounter = 1001;
 
-// Sample furniture items
+// factory method
+FurnitureCreator tableCreator = new TableCreator();
+FurnitureCreator chairCreator = new ChairCreator();
+FurnitureCreator bookshelfCreator = new BookshelfCreator();
+// abstract Factory
+FurnitureFactory pineFactory = new PineFurnitureFactory();
+FurnitureFactory oakFactory = new OakFurnitureFactory();
+FurnitureFactory steelFactory = new SteelFurnitureFactory();
+
 List<FurnitureItem> catalogue = new List<FurnitureItem>
 {
-    new Table(1, "Basic Dining Table", 599.99m, "Basic Dining Table", "Basic", 180, 90),
-    new Table(2, "Office Desk", 399.99m, "Office Desk", "Walnut", 140, 70),
-    new Chair(3, "Ergonomic Chair", 299.99m, "Ergonomic Chair", "Mesh", 120),
-    new Chair(4, "Dining Chair", 149.99m, "Dining Chair", "Oak", 90),
-    new BookShelf(5, "Kallax Shelf", 199.99m, "Kallax Shelf", "Pine", 150, 80, 4),
-    new BookShelf(6, "Billy Bookcase", 249.99m, "Billy Bookcase", "Oak", 200, 80, 5),
+    // factory method products
+    tableCreator.CreateFurniture(),
+    chairCreator.CreateFurniture(),
+    bookshelfCreator.CreateFurniture(),
+
+    // abstract Factory product families
+    pineFactory.CreateTable(),
+    pineFactory.CreateChair(),
+    pineFactory.CreateBookShelf(),
+
+    oakFactory.CreateTable(),
+    oakFactory.CreateChair(),
+    oakFactory.CreateBookShelf(),
+
+    steelFactory.CreateTable(),
+    steelFactory.CreateChair(),
+    steelFactory.CreateBookShelf()
 };
 
 // Sample cart
