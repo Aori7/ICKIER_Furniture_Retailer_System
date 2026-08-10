@@ -18,12 +18,9 @@ namespace ICKIER_Furniture_Retailer_System
         public double Width { get { return width; } }
         public int ShelfCount { get { return shelfCount; } }
 
-        public BookShelf(int furnitureId, string name, decimal basePrice,
-                         string material, double height, double width, int shelfCount)
+        public BookShelf(int furnitureId, string name, decimal basePrice, string description,
+                         string material, double height, double width, int shelfCount): base(furnitureId,name,basePrice, description)
         {
-            this.furnitureId = furnitureId;
-            this.name = name;
-            this.basePrice = basePrice;
             this.material = material;
             this.height = height;
             this.width = width;
