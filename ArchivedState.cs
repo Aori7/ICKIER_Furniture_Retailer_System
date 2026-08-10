@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class ArchivedState : OrderState
+    public class ArchivedState : OrderState
     {
         public ArchivedState(Order order) : base(order) { }
 

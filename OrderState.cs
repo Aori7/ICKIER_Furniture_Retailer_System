@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal abstract class OrderState
+    public abstract class OrderState
     {
         protected Order order;
 

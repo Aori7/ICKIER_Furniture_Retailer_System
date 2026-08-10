@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class PreparingState : OrderState
+    public class PreparingState : OrderState
     {
         public PreparingState(Order order) : base(order) { }
 
