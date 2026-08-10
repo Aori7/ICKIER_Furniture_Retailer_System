@@ -29,5 +29,37 @@ namespace ICKIER_Furniture_Retailer_System
             Console.WriteLine("Order placed successfully.");
             return true;
         }
+
+        public bool CancelOrder(Order order, Payment payment, Delivery delivery)
+        {
+            // let State pattern decide whether this order can be cancelled
+            bool cancelled = order.CancelOrder();
+
+            if (!cancelled)
+            {
+                Console.WriteLine("This order can no longer be cancelled.");
+                return false;
+            }
+
+            // cancellation succeeded
+            payment.RefundPayment();
+
+            Console.WriteLine("Order cancelled successfully.");
+            return true;
+        }
+
+        public List<Order> GetOrderHistory(Customer customer)
+        {
+            return customer.GetOrders();
+        }
+
+        public void DisplayOrderDetails(Order order, Payment payment, Delivery delivery)
+        {
+            Console.WriteLine("========= ORDER DETAILS =========");
+
+            Console.WriteLine($"Total: ${order.CalculateTotal():F2}");
+            payment.DisplayDetails();
+            delivery.DisplayDetails();
+        }
     }
 }
