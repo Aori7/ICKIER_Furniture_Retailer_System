@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class Chair : FurnitureItem
+    public class Chair : FurnitureItem
     {
         private string material;
         private double height;
