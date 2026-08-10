@@ -11,7 +11,7 @@ namespace ICKIER_Furniture_Retailer_System
     {
         protected FurnitureItem furniture;
 
-        public FurnitureDecorator(int furnitureId, FurnitureItem furniture)
+        public FurnitureDecorator(int furnitureId, FurnitureItem furniture):base(furnitureId,furniture.Name, furniture.BasePrice, furniture.Description)
         {
             this.furnitureId = furnitureId;
             this.furniture = furniture;
