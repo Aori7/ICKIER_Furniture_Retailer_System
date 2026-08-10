@@ -16,12 +16,9 @@ namespace ICKIER_Furniture_Retailer_System
         public double Length { get { return length; } }
         public double Width { get { return width; } }
 
-        public Table(int furnitureId, string name, decimal basePrice,
-                     string material, double length, double width)
+        public Table(int furnitureId, string name, decimal basePrice, string description,
+                     string material, double length, double width) : base (furnitureId, name, basePrice, description)
         {
-            this.furnitureId = furnitureId;
-            this.name = name;
-            this.basePrice = basePrice;
             this.material = material;
             this.length = length;
             this.width = width;
