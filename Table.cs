@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class Table : FurnitureItem
+    public class Table : FurnitureItem
     {
         private string material;
         private double length;
