@@ -12,6 +12,7 @@ namespace ICKIER_Furniture_Retailer_System
         public string Email { get; set; }
 
         private readonly List<Notification> notifications;
+        private readonly List<Brand> subscribedBrands;
 
         public Customer(int customerId, string name, string email)
         {
@@ -19,18 +20,37 @@ namespace ICKIER_Furniture_Retailer_System
             Name = name;
             Email = email;
             notifications = new List<Notification>();
+            subscribedBrands = new List<Brand>();
         }
 
         public void SubscribeToBrand(Brand brand)
         {
             Console.WriteLine($"{Name} subscribing to {brand.BrandName}...");
-            brand.Subscribe(this);
+
+            if (!subscribedBrands.Contains(brand))
+            {
+                brand.Subscribe(this);
+                subscribedBrands.Add(brand);
+            }
+            else
+            {
+                Console.WriteLine("You are already subscribed to this brand.");
+            }
         }
 
         public void UnsubscribeFromBrand(Brand brand)
         {
             Console.WriteLine($"{Name} unsubscribing from {brand.BrandName}...");
-            brand.Unsubscribe(this);
+
+            if (subscribedBrands.Contains(brand))
+            {
+                brand.Unsubscribe(this);
+                subscribedBrands.Remove(brand);
+            }
+            else
+            {
+                Console.WriteLine("You are not subscribed to this brand.");
+            }
         }
 
         public void Update(Promotion promotion)
@@ -68,6 +88,24 @@ namespace ICKIER_Furniture_Retailer_System
                 );
 
                 notification.MarkAsRead();
+            }
+        }
+        public void ViewSubscriptions()
+        {
+            Console.WriteLine();
+            Console.WriteLine($"=== Brand Subscriptions for {Name} ===");
+
+            if (subscribedBrands.Count == 0)
+            {
+                Console.WriteLine("You are not subscribed to any brands.");
+                return;
+            }
+
+            foreach (Brand brand in subscribedBrands)
+            {
+                Console.WriteLine(
+                    $"{brand.BrandId}. {brand.BrandName}"
+                );
             }
         }
     }

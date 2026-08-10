@@ -47,7 +47,14 @@ namespace ICKIER_Furniture_Retailer_System
 
             if (successful)
             {
-                IsPaid = true;
+                if (paymentStrategy is CashOnDeliveryPayment)
+                {
+                    IsPaid = false;
+                }
+                else
+                {
+                    IsPaid = true;
+                }
             }
 
             return successful;
@@ -75,6 +82,24 @@ namespace ICKIER_Furniture_Retailer_System
             }
 
             return successful;
+        }
+        public bool MarkCashOnDeliveryAsPaid()
+        {
+            if (paymentStrategy is not CashOnDeliveryPayment)
+            {
+                Console.WriteLine("This payment is not Cash on Delivery.");
+                return false;
+            }
+
+            if (IsPaid)
+            {
+                Console.WriteLine("Cash on Delivery payment has already been collected.");
+                return false;
+            }
+
+            IsPaid = true;
+            Console.WriteLine($"Cash on Delivery payment of ${Amount:F2} collected successfully.");
+            return true;
         }
     }
 }
