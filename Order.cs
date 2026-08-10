@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class Order
+    public class Order
     {
         private int orderId;
         private DateTime orderDate;
