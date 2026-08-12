@@ -12,23 +12,9 @@ namespace ICKIER_Furniture_Retailer_System
         public override void PlaceOrder() { Console.WriteLine("Order already placed, awaiting payment."); }
         public override void MakePayment()
         {
-            if (order.Payment != null && order.Payment.IsCashOnDelivery)
-            {
-                // Cash on Delivery - stays in Preparing so customer can still cancel
-                Console.WriteLine($"Order {order.OrderId}: Cash on Delivery selected. Order is being prepared...");
-                order.Status = "Preparing";
-                order.SetState(order.PreparingState);
-            }
-            else
-            {
-                // Credit Card / PayPal - paid immediately, packing done, goes straight to Out for Delivery
-                Console.WriteLine($"Order {order.OrderId}: Payment successful.");
-                Console.WriteLine($"Order {order.OrderId}: Packing completed.");
-                Console.WriteLine($"Order {order.OrderId}: Order is now out for delivery!");
-                order.Status = "Out for Delivery";
-                order.DeliveryDate = DateTime.Now;
-                order.SetState(order.OutForDeliveryState);
-            }
+            Console.WriteLine($"Order {order.OrderId}: Payment successful. Preparing order...");
+            order.Status = "Preparing";
+            order.SetState(order.PreparingState);
         }
         public override void CancelOrder()
         {

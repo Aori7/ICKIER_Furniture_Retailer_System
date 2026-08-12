@@ -5,7 +5,7 @@ using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class Order
+    public class Order
     {
         private int orderId;
         private DateTime orderDate;
@@ -14,8 +14,8 @@ namespace ICKIER_Furniture_Retailer_System
         private decimal totalAmount;
         private List<OrderItem> items;
         private OrderState currentState;
-        private Payment payment;
-        private Delivery delivery;
+        private Payment? payment;
+        private Delivery? delivery;
 
         private OrderState createdState;
         private OrderState awaitingPaymentState;
@@ -39,8 +39,8 @@ namespace ICKIER_Furniture_Retailer_System
         public string Status { get { return status; } set { status = value; } }
         public decimal TotalAmount { get { return totalAmount; } }
         public DateTime DeliveryDate { get { return deliveryDate; } set { deliveryDate = value; } }
-        public Payment Payment { get { return payment; } }
-        public Delivery Delivery { get { return delivery; } }
+        public Payment? Payment { get { return payment; } }
+        public Delivery? Delivery { get { return delivery; } }
 
         public Order(int orderId)
         {
@@ -82,6 +82,10 @@ namespace ICKIER_Furniture_Retailer_System
         {
             items.Remove(item);
             totalAmount -= item.calculateSubtotal();
+        }
+        public void SetPayment(Payment payment)
+        {
+            this.payment = payment;
         }
         public decimal calculateTotal() { return totalAmount; }
     }

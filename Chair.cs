@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class Chair : FurnitureItem
+    public class Chair : FurnitureItem
     {
         private string material;
         private double height;
@@ -14,12 +14,9 @@ namespace ICKIER_Furniture_Retailer_System
         public string Material { get { return material; } }
         public double Height { get { return height; } }
 
-        public Chair(int furnitureId, string name, decimal basePrice,
-                     string material, double height)
+        public Chair(int furnitureId, string name, decimal basePrice, string description,
+                     string material, double height) : base(furnitureId, name, basePrice, description)
         {
-            this.furnitureId = furnitureId;
-            this.name = name;
-            this.basePrice = basePrice;
             this.material = material;
             this.height = height;
         }
