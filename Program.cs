@@ -349,8 +349,26 @@ void Checkout()
     orderHistory.Insert(0, newOrder);
     lastOrder = newOrder;
 
-    Console.WriteLine($"\nPayment of ${total:N2} via {payMethod} completed successfully.");
+    Console.WriteLine();
+    Console.WriteLine("Checkout completed successfully.");
+    Console.WriteLine($"Payment amount: ${total:N2}");
     Console.WriteLine($"Order ID: ORD{newOrder.OrderId} has been placed!");
+
+    // Show different message based on payment method
+    if (newOrder.Status == "Preparing")
+    {
+        Console.WriteLine();
+        Console.WriteLine("Payment method: Cash on Delivery");
+        Console.WriteLine("Your order is currently being prepared.");
+        Console.WriteLine("You can still cancel your order at this stage.");
+        Console.WriteLine("Payment will be collected upon delivery.");
+    }
+    else if (newOrder.Status == "Out for Delivery")
+    {
+        Console.WriteLine();
+        Console.WriteLine("Your order is now out for delivery!");
+        Console.WriteLine("Cancellation is no longer possible.");
+    }
 
     cart.Clear();
     Console.ReadKey();
