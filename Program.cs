@@ -626,9 +626,10 @@ void Checkout()
     Console.WriteLine($"Total Amount: ${total:N2}");
     Console.WriteLine($"Order Status: {newOrder.Status}");
 
+    Console.WriteLine($"Payment Method: {payment.PaymentMethod}");
+
     if (payment.IsCashOnDelivery)
     {
-        Console.WriteLine("Payment Method: Cash on Delivery");
         Console.WriteLine("Payment Status: Pending Collection");
     }
     else
@@ -750,6 +751,7 @@ void ViewOrderDetails()
 
     if (found.Payment != null)
     {
+        Console.WriteLine($"Payment Method: {found.Payment.PaymentMethod}");
         if (found.Payment.IsCashOnDelivery)
         {
             Console.WriteLine(
@@ -874,7 +876,7 @@ void ManageOrder()
         Console.WriteLine($"Total:    ${found.TotalAmount:N2}\n");
         Console.WriteLine("1. Cancel Order");
         Console.WriteLine("2. Track Delivery");
-        Console.WriteLine("3. Simulate Delivery Update (Demo)");
+        Console.WriteLine("3. Process Next Delivery Stage");
         Console.WriteLine("0. Back");
         Console.Write("\nEnter your choice: ");
         string choice = Console.ReadLine() ?? "";
@@ -960,7 +962,7 @@ void ManageOrder()
                 break;
 
             case "3":
-                Console.WriteLine("\n=== Delivery Update Demo ===");
+                Console.WriteLine("\n=== Process Delivery ===");
 
                 if (found.Status == "Preparing")
                 {
@@ -1008,7 +1010,7 @@ void ManageOrder()
                 break;
             default:
                 Console.WriteLine(
-                    "Invalid option. Please enter 0, 1, or 2."
+                    "Invalid option. Please enter 0, 1, 2, or 3."
                 );
                 break;
         }

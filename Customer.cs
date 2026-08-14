@@ -85,7 +85,7 @@ namespace ICKIER_Furniture_Retailer_System
                 string status = notification.IsRead ? "Read" : "Unread";
 
                 Console.WriteLine(
-                    $"[{status}] {notification.Message}"
+                    $"[{status}] {notification.CreatedDate:dd/MM/yyyy HH:mm} - {notification.Message}"
                 );
 
                 notification.MarkAsRead();

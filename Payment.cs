@@ -22,7 +22,13 @@ namespace ICKIER_Furniture_Retailer_System
                 return paymentStrategy is CashOnDeliveryPayment;
             }
         }
-
+        public string PaymentMethod
+        {
+            get
+            {
+                return paymentStrategy?.MethodName ?? "Not Selected";
+            }
+        }
         public Payment(int paymentId, decimal amount)
         {
             PaymentId = paymentId;
@@ -115,12 +121,6 @@ namespace ICKIER_Furniture_Retailer_System
             Console.WriteLine($"Cash on Delivery payment of ${Amount:F2} collected successfully.");
             return true;
         }
-        public string PaymentMethod
-        {
-            get
-            {
-                return paymentStrategy?.MethodName ?? "Not Selected";
-            }
-        }
+        
     }
 }
