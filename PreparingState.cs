@@ -13,8 +13,12 @@ namespace ICKIER_Furniture_Retailer_System
         public override void MakePayment() { Console.WriteLine("Payment already processed."); }
         public override void CancelOrder()
         {
-            Console.WriteLine($"Order {order.OrderId}: Order cancelled before shipping. Payment refunded.");
+            Console.WriteLine($"Order {order.OrderId}: Order cancelled before shipping.");
+
             order.Status = "Cancelled";
+
+            order.Delivery?.UpdateStatus("Cancelled");
+
             order.SetState(order.CancelledState);
         }
         public override void ConfirmDelivery() { Console.WriteLine("Cannot confirm delivery - order not shipped yet."); }
@@ -24,7 +28,11 @@ namespace ICKIER_Furniture_Retailer_System
         public override void PackingCompleted()
         {
             Console.WriteLine($"Order {order.OrderId}: Packing completed. Order is out for delivery.");
+
             order.Status = "Out for Delivery";
+
+            order.Delivery?.UpdateStatus("Out for Delivery");
+
             order.SetState(order.OutForDeliveryState);
         }
     }

@@ -15,8 +15,12 @@ namespace ICKIER_Furniture_Retailer_System
         public override void ConfirmDelivery()
         {
             Console.WriteLine($"Order {order.OrderId}: Delivery confirmed.");
+
             order.Status = "Delivered";
             order.DeliveryDate = DateTime.Now;
+
+            order.Delivery?.UpdateStatus("Delivered");
+
             order.SetState(order.DeliveredState);
         }
         public override void RequestReturn() { Console.WriteLine("Cannot return - order not delivered yet."); }

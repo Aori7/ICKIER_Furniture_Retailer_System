@@ -23,13 +23,13 @@ namespace ICKIER_Furniture_Retailer_System
             }
             else
             {
-                // Credit Card / PayPal - paid immediately, packing done, goes straight to Out for Delivery
+                // Credit Card / PayPal - payment completed, order now enters Preparing
                 Console.WriteLine($"Order {order.OrderId}: Payment successful.");
-                Console.WriteLine($"Order {order.OrderId}: Packing completed.");
-                Console.WriteLine($"Order {order.OrderId}: Order is now out for delivery!");
-                order.Status = "Out for Delivery";
-                order.DeliveryDate = DateTime.Now;
-                order.SetState(order.OutForDeliveryState);
+                Console.WriteLine($"Order {order.OrderId}: Payment confirmed. Preparing order...");
+                Console.WriteLine("You can still cancel your order before it is out for delivery.");
+
+                order.Status = "Preparing";
+                order.SetState(order.PreparingState);
             }
         }
 

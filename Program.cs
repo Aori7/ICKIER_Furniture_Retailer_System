@@ -74,7 +74,8 @@ while (running)
     Console.WriteLine("4. Checkout");
     Console.WriteLine("5. View Order History");
     Console.WriteLine("6. Repeat Last Order");
-    Console.WriteLine("7. Brand Subscriptions & Promotions");
+    Console.WriteLine("7. Manage Brand Subscriptions");
+    Console.WriteLine("8. View Notifications");
     Console.WriteLine("9. Manage Order");
     Console.WriteLine("0. Exit");
     Console.Write("\nEnter your choice: ");
@@ -90,8 +91,17 @@ while (running)
         case "4": Checkout(); break;
         case "5": ViewOrderHistory(); break;
         case "6": RepeatLastOrder(); break;
-        case "7": ManageBrandSubscriptions(); break;
-        case "9": ManageOrder(); break;
+        case "7":
+            ManageBrandSubscriptions();
+            break;
+
+        case "8":
+            customer.ViewNotifications();
+            break;
+
+        case "9":
+            ManageOrder();
+            break;
         case "0":
             Console.WriteLine("Hope you enjoy browsing ICKIER!");
             Console.WriteLine("See you again!");
@@ -582,6 +592,14 @@ void Checkout()
     // Create order
     Order newOrder = new Order(orderCounter++);
     newOrder.SetPayment(payment);
+    Delivery delivery = new Delivery(
+    newOrder.OrderId,
+    address,
+    deliveryDate,
+    $"TRK{newOrder.OrderId}"
+    );
+
+    newOrder.SetDelivery(delivery);
     foreach (var (item, qty) in cart)
     {
         newOrder.addItem(
@@ -600,9 +618,32 @@ void Checkout()
     lastOrder = newOrder;
 
     Console.WriteLine();
-    Console.WriteLine("Checkout completed successfully.");
-    Console.WriteLine($"Payment amount: ${total:N2}");
-    Console.WriteLine($"Order ID: ORD{newOrder.OrderId} has been placed!");
+    Console.WriteLine("================================");
+    Console.WriteLine("       ORDER CONFIRMED");
+    Console.WriteLine("================================");
+
+    Console.WriteLine($"Order ID: ORD{newOrder.OrderId}");
+    Console.WriteLine($"Total Amount: ${total:N2}");
+    Console.WriteLine($"Order Status: {newOrder.Status}");
+
+    if (payment.IsCashOnDelivery)
+    {
+        Console.WriteLine("Payment Method: Cash on Delivery");
+        Console.WriteLine("Payment Status: Pending Collection");
+    }
+    else
+    {
+        Console.WriteLine("Payment Status: Paid");
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("Delivery Details:");
+    Console.WriteLine($"Address: {delivery.DeliveryAddress}");
+    Console.WriteLine($"Preferred Delivery Date: {delivery.ScheduledDate:dd/MM/yyyy}");
+    Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+    Console.WriteLine($"Tracking Number: {delivery.TrackingNumber}");
+
+    Console.WriteLine("================================");
 
     cart.Clear();
 }
@@ -695,6 +736,17 @@ void ViewOrderDetails()
     Console.WriteLine($"Order ID: ORD{found.OrderId}");
     Console.WriteLine($"Status:   {found.Status}");
     Console.WriteLine($"Total:    ${found.TotalAmount:N2}");
+    if (found.Delivery != null)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Delivery Details:");
+        Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
+        Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
+        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+        Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
+        Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+    }
+
 
     if (found.Payment != null)
     {
@@ -702,16 +754,16 @@ void ViewOrderDetails()
         {
             Console.WriteLine(
                 found.Payment.IsPaid
-                    ? "Payment: Cash on Delivery - Paid"
-                    : "Payment: Cash on Delivery - Pending Collection"
+                    ? "Payment status: Cash on Delivery - Paid"
+                    : "Payment status: Cash on Delivery - Pending Collection"
             );
         }
         else
         {
             Console.WriteLine(
                 found.Payment.IsPaid
-                    ? "Payment: Paid"
-                    : "Payment: Not Paid"
+                    ? "Payment status: Paid"
+                    : "Payment status: Not Paid"
             );
         }
 
@@ -719,6 +771,18 @@ void ViewOrderDetails()
         {
             Console.WriteLine("Refund Status: Refunded");
         }
+    }
+    Console.WriteLine();
+    Console.WriteLine("What would you like to do?");
+    Console.WriteLine("1. Manage This Order");
+    Console.WriteLine("0. Back");
+    Console.Write("Enter your choice: ");
+
+    string detailChoice = Console.ReadLine() ?? "";
+
+    if (detailChoice == "1")
+    {
+        ManageOrder();
     }
 }
 // ─── Option 6: Repeat Last Order ──────────────────────────────────────
@@ -810,6 +874,7 @@ void ManageOrder()
         Console.WriteLine($"Total:    ${found.TotalAmount:N2}\n");
         Console.WriteLine("1. Cancel Order");
         Console.WriteLine("2. Track Delivery");
+        Console.WriteLine("3. Simulate Delivery Update (Demo)");
         Console.WriteLine("0. Back");
         Console.Write("\nEnter your choice: ");
         string choice = Console.ReadLine() ?? "";
@@ -847,17 +912,97 @@ void ManageOrder()
                     else
                     {
                         Console.WriteLine("\nCancellation unsuccessful.");
-                        Console.WriteLine("The order has already been sent out for delivery,");
-                        Console.WriteLine("so no cancellation or refund is allowed.");
+
+                        if (found.Status == "Out for Delivery")
+                        {
+                            Console.WriteLine(
+                                "The order is already out for delivery."
+                            );
+                            Console.WriteLine(
+                                "Cancellation and refund are no longer available."
+                            );
+                        }
+                        else if (found.Status == "Delivered")
+                        {
+                            Console.WriteLine(
+                                "The order has already been delivered and cannot be cancelled."
+                            );
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                $"Order cannot be cancelled while its status is {found.Status}."
+                            );
+                        }
                     }
                 }
                 
                 back = true;
                 break;
             case "2":
-                Console.WriteLine($"\nTracking Order ORD{found.OrderId}...");
-                Console.WriteLine($"Current Status: {found.Status}");
+                Console.WriteLine($"\n=== Track Delivery ORD{found.OrderId} ===");
+
+                Console.WriteLine($"Order Status: {found.Status}");
+
+                if (found.Delivery != null)
+                {
+                    Console.WriteLine($"Delivery Address: {found.Delivery.DeliveryAddress}");
+                    Console.WriteLine($"Expected Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
+                    Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+                    Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
+                    Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+                }
+                else
+                {
+                    Console.WriteLine("Delivery information is not available for this order.");
+                }
+
                 break;
+
+            case "3":
+                Console.WriteLine("\n=== Delivery Update Demo ===");
+
+                if (found.Status == "Preparing")
+                {
+                    Console.WriteLine("Packing has been completed.");
+
+                    found.PackingCompleted();
+
+                    Console.WriteLine(
+                        $"Order ORD{found.OrderId} is now out for delivery."
+                    );
+                }
+                else if (found.Status == "Out for Delivery")
+                {
+                    Console.WriteLine("Confirming delivery...");
+
+                    found.ConfirmDelivery();
+
+                    Console.WriteLine(
+                        $"Order ORD{found.OrderId} has been delivered successfully."
+                    );
+                }
+                else if (found.Status == "Delivered")
+                {
+                    Console.WriteLine(
+                        "This order has already been delivered."
+                    );
+                }
+                else if (found.Status == "Cancelled")
+                {
+                    Console.WriteLine(
+                        "A cancelled order cannot proceed with delivery."
+                    );
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"Delivery cannot be updated while the order status is {found.Status}."
+                    );
+                }
+
+                break;
+
             case "0":
                 back = true;
                 break;

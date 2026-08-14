@@ -86,6 +86,12 @@ namespace ICKIER_Furniture_Retailer_System
         public void SetPayment(Payment payment)
         {
             this.payment = payment;
+
+        }
+        public void SetDelivery(Delivery delivery)
+        {
+            this.delivery = delivery;
+            this.deliveryDate = delivery.ScheduledDate;
         }
         public decimal calculateTotal() { return totalAmount; }
     }
