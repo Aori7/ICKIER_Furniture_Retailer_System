@@ -16,9 +16,13 @@ namespace ICKIER_Furniture_Retailer_System
 
         public bool Refund(decimal amount)
         {
-            Console.WriteLine($"Refund of ${amount:F2} for Cash on Delivery.");
-            Console.WriteLine("Cash on Delivery refund processed successfully.");
-            return true;
+            Console.WriteLine(
+                "Cash on Delivery does not require a refund because payment has not been collected."
+            );
+
+            return false;
         }
+        public string MethodName => "Cash on Delivery";
+
     }
 }

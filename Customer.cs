@@ -53,14 +53,15 @@ namespace ICKIER_Furniture_Retailer_System
             }
         }
 
-        public void Update(Promotion promotion)
+        public void Update(Brand brand, Promotion promotion)
         {
             int notificationId = notifications.Count + 1;
 
             string message =
-                $"New promotion: {promotion.Title} - " +
-                $"{promotion.DiscountPercentage}% off. " +
-                $"{promotion.Description}";
+               $"New promotion from {brand.BrandName}: " +
+               $"{promotion.Title} - " +
+               $"{promotion.DiscountPercentage}% off. " +
+               $"{promotion.Description}";
 
             Notification notification =
                 new Notification(notificationId, message);

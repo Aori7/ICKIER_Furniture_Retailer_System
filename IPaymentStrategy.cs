@@ -7,6 +7,8 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public interface IPaymentStrategy
     {
+        string MethodName { get; }
+
         bool Pay(decimal amount);
 
         bool Refund(decimal amount);

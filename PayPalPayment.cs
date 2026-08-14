@@ -1,7 +1,5 @@
-﻿//Zi Ying
+﻿// Zi Ying
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ICKIER_Furniture_Retailer_System
 {
@@ -14,25 +12,49 @@ namespace ICKIER_Furniture_Retailer_System
             Email = email;
         }
 
+        public string MethodName => "PayPal";
+
         public bool Pay(decimal amount)
         {
-            if (string.IsNullOrWhiteSpace(Email) ||
-                !Email.Contains("@") ||
-                !Email.Contains("."))
+            if (string.IsNullOrWhiteSpace(Email))
             {
-                Console.WriteLine("Invalid PayPal email address.");
+                Console.WriteLine(
+                    "Invalid PayPal email address. Please use a format such as name@example.com."
+                );
                 return false;
             }
 
-            Console.WriteLine($"Processing PayPal payment of ${amount:F2}...");
+            int atIndex = Email.IndexOf('@');
+            int lastDotIndex = Email.LastIndexOf('.');
+
+            if (atIndex <= 0 ||
+                atIndex != Email.LastIndexOf('@') ||
+                lastDotIndex <= atIndex + 1 ||
+                lastDotIndex == Email.Length - 1)
+            {
+                Console.WriteLine(
+                    "Invalid PayPal email address. Please use a format such as name@example.com."
+                );
+                return false;
+            }
+
+            Console.WriteLine(
+                $"Processing PayPal payment of ${amount:F2}..."
+            );
+
             Console.WriteLine("PayPal payment successful.");
+
             return true;
         }
 
         public bool Refund(decimal amount)
         {
-            Console.WriteLine($"Refunding ${amount:F2} through PayPal...");
+            Console.WriteLine(
+                $"Refunding ${amount:F2} through PayPal..."
+            );
+
             Console.WriteLine("PayPal refund successful.");
+
             return true;
         }
     }

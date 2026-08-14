@@ -14,6 +14,7 @@ namespace ICKIER_Furniture_Retailer_System
         {
             CardNumber = cardNumber;
         }
+        public string MethodName => "Credit Card";
 
         public bool Pay(decimal amount)
         {

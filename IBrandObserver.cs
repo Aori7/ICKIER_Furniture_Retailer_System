@@ -7,6 +7,6 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public interface IBrandObserver
     {
-        void Update(Promotion promotion);
+        void Update(Brand brand, Promotion promotion);
     }
 }

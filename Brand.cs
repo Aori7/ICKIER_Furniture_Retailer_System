@@ -27,7 +27,7 @@ namespace ICKIER_Furniture_Retailer_System
             if (!observers.Contains(observer))
             {
                 observers.Add(observer);
-                Console.WriteLine("Subscription successful.");
+                Console.WriteLine($"Successfully subscribed to {BrandName}.");
             }
             else
             {
@@ -40,7 +40,7 @@ namespace ICKIER_Furniture_Retailer_System
             if (observers.Contains(observer))
             {
                 observers.Remove(observer);
-                Console.WriteLine("Unsubscription successful.");
+                Console.WriteLine($"Successfully unsubscribed from {BrandName}.");
             }
             else
             {
@@ -52,7 +52,7 @@ namespace ICKIER_Furniture_Retailer_System
         {
             foreach (IBrandObserver observer in observers)
             {
-                observer.Update(promotion);
+                observer.Update(this, promotion);
             }
         }
 
