@@ -8,41 +8,21 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class RepeatLastOrderCommand : OrderCommand
     {
-        private Order order;
+        private RepeatOrderService receiver;
 
-        public RepeatLastOrderCommand(Order order)
+        public RepeatLastOrderCommand(RepeatOrderService receiver)
         {
-            this.order = order;
+            this.receiver = receiver;
         }
 
         public void Execute()
         {
-            order.PlaceOrder();
+            receiver.RepeatLastOrder();
         }
 
         public void Undo()
         {
-            order.CancelOrder();
+            receiver.CancelRepeatedOrder();
         }
-        //private OrderFacade receiver;
-        //private Customer cust;
-        //private Order repeatedOrder;
-
-        //public RepeatLastOrderCommand(OrderFacade receiver, Customer cust)
-        //{
-        //    this.receiver = receiver;
-        //    this.cust = cust;
-        //}
-        //public void Execute()
-        //{
-        //    repeatedOrder = receiver.RepeatLastOrder(cust);
-        //}
-        //public void Undo()
-        //{
-        //    if (repeatedOrder != null)
-        //    {
-        //        receiver.CancelOrder(repeatedOrder);
-        //    }
-        //}
-    } 
-}
+    }
+} 
