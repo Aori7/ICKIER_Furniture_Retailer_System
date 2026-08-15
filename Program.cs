@@ -5,42 +5,63 @@
 
 using ICKIER_Furniture_Retailer_System;
 
+List<FurnitureItem> catalogue = new List<FurnitureItem>();
+
+// furniture collections
+FurnitureCollection bedroom = new FurnitureCollection(1, "Bedroom Collection", "Bedroom items");
+FurnitureCollection livingRoom = new FurnitureCollection(2, "Living Room Collection", "Living Room items");
+FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Office items");
+FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
+FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
+
+// making items
+FurnitureItem table1 = new FurnitureItem(1, "Table", 2000, "sturdy =material= table");
+FurnitureItem cabinet1 = new FurnitureItem(2, "Cabinet", 3000, "sturdy =material= Cabinet");
+FurnitureItem chair1 = new FurnitureItem(3, "Chair", 500, "sturdy =material= Chair");
+FurnitureItem bookshelf1 = new FurnitureItem(4, "Bookshelf", 2500, "sturdy =material= Bookshelf");
+FurnitureItem showerHead1 = new FurnitureItem(5, "Shower Head", 700, "sturdy Shower Head");
+FurnitureItem sink1 = new FurnitureItem(6, "Sink", 300, "sturdy =material= Sink");
+FurnitureItem stove1 = new FurnitureItem(7, "Stove", 600, "sturdy Stove");
+FurnitureItem door1 = new FurnitureItem(8, "Door", 200, "sturdy =material= Door");
+FurnitureItem bed1 = new FurnitureItem(9, "Bed", 15000, "sturdy =material= Bed");
+FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= Sofa");
+
+
+// adding items into collection
+bedroom.Add(bed1);
+bedroom.Add(bookshelf1);
+bedroom.Add(door1);
+
+livingRoom.Add(table1);
+livingRoom.Add(sofa1);
+livingRoom.Add(chair1);
+
+office.Add(table1);
+office.Add(chair1);
+office.Add(bookshelf1);
+office.Add(door1);
+
+kitchen.Add(sink1);
+kitchen.Add(stove1);
+
+bathroom.Add(showerHead1);
+bathroom.Add(sink1);
+bathroom.Add(door1);
+
+
+
+// list of collections
+List<CatalogComponent> Catlogue = new List<CatalogComponent>
+{
+    bedroom, livingRoom, office, kitchen, bathroom
+};
+
 // Sample data setup
 List<Order> orderHistory = new List<Order>();
 Order? lastOrder = null;
 List<(FurnitureItem item, int qty)> lastOrderItems =
     new List<(FurnitureItem item, int qty)>();
 int orderCounter = 1001;
-
-// factory method
-FurnitureCreator tableCreator = new TableCreator();
-FurnitureCreator chairCreator = new ChairCreator();
-FurnitureCreator bookshelfCreator = new BookshelfCreator();
-// abstract Factory
-FurnitureFactory pineFactory = new PineFurnitureFactory();
-FurnitureFactory oakFactory = new OakFurnitureFactory();
-FurnitureFactory steelFactory = new SteelFurnitureFactory();
-
-List<FurnitureItem> catalogue = new List<FurnitureItem>
-{
-    // factory method products
-    tableCreator.CreateFurniture(),
-    chairCreator.CreateFurniture(),
-    bookshelfCreator.CreateFurniture(),
-
-    // abstract Factory product families
-    pineFactory.CreateTable(),
-    pineFactory.CreateChair(),
-    pineFactory.CreateBookShelf(),
-
-    oakFactory.CreateTable(),
-    oakFactory.CreateChair(),
-    oakFactory.CreateBookShelf(),
-
-    steelFactory.CreateTable(),
-    steelFactory.CreateChair(),
-    steelFactory.CreateBookShelf()
-};
 
 // Sample cart
 List<(FurnitureItem item, int qty)> cart = new List<(FurnitureItem, int)>();
@@ -119,15 +140,16 @@ void BrowseFurniture()
     bool back = false;
     while (!back)
     {
-       
-
         Console.WriteLine("=== Browse Furniture ===\n");
+
         Console.WriteLine("Select Furniture Collection:");
         Console.WriteLine("1. Living Room Collection");
         Console.WriteLine("2. Bedroom Collection");
         Console.WriteLine("3. Office Collection");
         Console.WriteLine("0. Back");
+
         Console.Write("\nEnter your choice: ");
+
         string col = Console.ReadLine() ?? "";
 
         List<FurnitureItem> collection = new List<FurnitureItem>();
