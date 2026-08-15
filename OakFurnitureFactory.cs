@@ -8,17 +8,17 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class OakFurnitureFactory : FurnitureFactory
     {
-        public Table CreateTable()
+        public Table CreateTable(double length, double width)
         {
-            return new OakTable();
+            return new OakTable(101, "Oak Table", 800m, "Custom oak table", "Oak", length, width);
         }
-        public Chair CreateChair()
+        public Chair CreateChair(double height)
         {
-            return new OakChair();
+            return new OakChair(102, "Oak Chair", 300m, "Custom oak chair", "Oak", height);
         }
-        public BookShelf CreateBookShelf()
+        public BookShelf CreateBookShelf(double height, double width, int shelfCount)
         {
-            return new OakBookShelf();
+            return new OakBookShelf(103, "Oak BookShelf", 500m, "Custom oak bookshelf", "Oak", height, width, shelfCount);
         }
     }
 }
