@@ -230,7 +230,7 @@ void BrowseFurniture()
                     {
                         fact = pineFactory;
                     }
-                    else if (materialChoice == "3")
+                    else if (materialChoice == "3") 
                     {
                         fact = steelFactory;
                     }

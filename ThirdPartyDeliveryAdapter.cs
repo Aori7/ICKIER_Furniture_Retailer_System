@@ -16,7 +16,7 @@ namespace ICKIER_Furniture_Retailer_System
             this.externalCourier = externalCourier;
         }
 
-        public void ScheduleDelivery()
+        public override void ScheduleDelivery()
         {
             externalCourier.BookShipment(DeliveryAddress, ScheduledDate);
         }
