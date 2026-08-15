@@ -8,7 +8,7 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class PineBookShelf : BookShelf
     {
-        public PineBookShelf() : base(103, "Pine Bookshelf", 200m, "A spacious pine bookshelf.", "Pine", 180, 90, 30)
+        public PineBookShelf(int furnitureId, string name, decimal basePrice, string description, double height, double width, int shelfCount) : base(furnitureId, name, basePrice, description, "Pine", height, width, shelfCount)
         {
         }
     }

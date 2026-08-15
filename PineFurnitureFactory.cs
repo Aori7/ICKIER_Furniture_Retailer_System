@@ -8,17 +8,19 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class PineFurnitureFactory : FurnitureFactory
     {
-        public Table CreateTable()
+        public Table CreateTable(double length, double width)
         {
-            return new PineTable();
+            return new PineTable(201, "Pine Table", 500m, "Custom pine table", length, width);
         }
-        public Chair CreateChair()
+
+        public Chair CreateChair(double height)
         {
-            return new PineChair();
+            return new PineChair(202, "Pine Chair", 200m, "Custom pine chair", height);
         }
-        public BookShelf CreateBookShelf()
+
+        public BookShelf CreateBookShelf(double height, double width, int shelfCount)
         {
-            return new PineBookShelf();
+            return new PineBookShelf(203, "Pine BookShelf", 400m, "Custom pine bookshelf", height, width, shelfCount);
         }
     }
 }
