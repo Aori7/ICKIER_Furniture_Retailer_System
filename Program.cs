@@ -8,14 +8,14 @@ using System.Collections;
 
 List<FurnitureItem> catalogue = new List<FurnitureItem>();
 
-// furniture collections
+// furniture collections; composite pattern
 FurnitureCollection bedroom = new FurnitureCollection(1, "Bedroom Collection", "Bedroom items");
 FurnitureCollection livingRoom = new FurnitureCollection(2, "Living Room Collection", "Living Room items");
 FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Office items");
 FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
 FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
 
-// create material factories
+// create material factories; asbtract factory pattern
 FurnitureFactory oakFactory = new OakFurnitureFactory();
 FurnitureFactory pineFactory = new PineFurnitureFactory();
 FurnitureFactory steelFactory = new SteelFurnitureFactory();
@@ -31,7 +31,6 @@ FurnitureItem stove1 = new FurnitureItem(7, "Stove", 600, "sturdy Stove");
 FurnitureItem door1 = new FurnitureItem(8, "Door", 200, "sturdy =material= Door");
 FurnitureItem bed1 = new FurnitureItem(9, "Bed", 15000, "sturdy =material= Bed");
 FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= Sofa");
-
 
 // adding items into collection
 bedroom.Add(bed1);
@@ -70,6 +69,13 @@ int orderCounter = 1001;
 
 // Sample cart
 List<(FurnitureItem item, int qty)> cart = new List<(FurnitureItem, int)>();
+
+//command pattern
+RepeatOrderService repeatOrderService = new RepeatOrderService(cart, lastOrderItems);
+OrderCommandInvoker orderCommandInvoker = new OrderCommandInvoker();
+RepeatLastOrderCommand repeatCommand = new RepeatLastOrderCommand(repeatOrderService);
+orderCommandInvoker.SetCommand(repeatCommand);
+
 // Observer Pattern - Customer and Brands
 Customer customer = new Customer(
 1,
@@ -175,7 +181,7 @@ while (!back)
         Console.WriteLine("Invalid collection.");
         continue;
     }
-    else // 
+    else // composite pattern
     {
         FurnitureCollection collection = Catalogue[choice - 1];
 
@@ -210,7 +216,7 @@ while (!back)
             FurnitureItem item = (FurnitureItem)collection.Children[choice2 - 1];
             FurnitureItem selected = item;
 
-            //customisable furnitures
+            //customisable furnitures; abstract factory pattern
             if (item.Name == "Table" || item.Name == "Chair" || item.Name == "Bookshelf")
             {
                 Console.WriteLine("\nCustomise Furniture");
@@ -284,8 +290,7 @@ while (!back)
                 }
                 else if (decision.ToUpper() == "Y")
                 {
-                    //FurnitureItem selected = item;
-
+                    //decorator pattern
                     while (true)
                     {
                         Console.WriteLine("\nAdd-ons:");
@@ -599,6 +604,7 @@ void Checkout()
     //Console.WriteLine("\nConnecting to external delivery provider...");
     Console.WriteLine($"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM");
 
+    //factory pattern
     Console.WriteLine("\nSelect Delivery Type:");
     Console.WriteLine("1. Standard Delivery");
     Console.WriteLine("2. Express Delivery");
@@ -705,12 +711,6 @@ void Checkout()
 
     delivery.ScheduleDelivery();
     newOrder.SetDelivery(delivery);
-    //Delivery delivery = new Delivery(
-    //newOrder.OrderId,
-    //address,
-    //deliveryDate,
-    //$"TRK{newOrder.OrderId}"
-    //);
 
     foreach (var (item, qty) in cart)
     {
@@ -758,6 +758,12 @@ void Checkout()
 
     Console.WriteLine("================================");
 
+    //save current order
+    lastOrderItems.Clear();
+    foreach (var item in cart)
+    {
+        lastOrderItems.Add(item);
+    }
     cart.Clear();
 }
 
@@ -901,53 +907,54 @@ void ViewOrderDetails()
     }
 }
 // ─── Option 6: Repeat Last Order ──────────────────────────────────────
+// command pattern
 void RepeatLastOrder()
 {
+    Console.WriteLine("\n=== Repeat Last Order ===");
 
-    Console.WriteLine("=== Repeat Last Order ===\n");
-
-    if (lastOrder == null)
+    if (lastOrder == null || lastOrderItems.Count == 0)
     {
         Console.WriteLine("No previous order found.");
-
         return;
     }
 
     Console.WriteLine($"Last Order: ORD{lastOrder.OrderId}");
     Console.WriteLine($"Total: ${lastOrder.TotalAmount:N2}");
-    Console.WriteLine("\nRepeat this order?");
-    Console.WriteLine("1. Confirm");
-    Console.WriteLine("2. Cancel");
+    Console.WriteLine("1. Repeat Order");
     Console.WriteLine("0. Back");
-    Console.Write("\nEnter your choice: ");
+    Console.Write("Enter choice: ");
+
     string choice = Console.ReadLine() ?? "";
 
     if (choice == "1")
     {
-        if (lastOrderItems.Count == 0)
+        orderCommandInvoker.ExecuteCommand();
+
+        Console.WriteLine("\nPrevious order has been repeated.");
+        Console.WriteLine("1. Proceed to Checkout");
+        Console.WriteLine("2. Undo Repeat");
+        Console.WriteLine("0. Back");
+        Console.Write("Enter choice: ");
+
+        string repeatChoice = Console.ReadLine() ?? "";
+
+        if (repeatChoice == "1")
         {
-            Console.WriteLine(
-                "The previous order items could not be found."
-            );
+            Console.WriteLine("Please confirm delivery and payment details again.");
+            Checkout();
+        }
+        else if (repeatChoice == "2")
+        {
+            orderCommandInvoker.UndoCommand();
+        }
+        else if (repeatChoice == "0")
+        {
             return;
         }
-
-        cart.Clear();
-
-        foreach (var (item, qty) in lastOrderItems)
+        else
         {
-            cart.Add((item, qty));
+            Console.WriteLine("Invalid choice.");
         }
-
-        Console.WriteLine(
-            "\nPrevious order items have been added back to your cart."
-        );
-
-        Console.WriteLine(
-            "Please confirm delivery and payment details again."
-        );
-
-        Checkout();
     }
 }
 
