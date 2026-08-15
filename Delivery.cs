@@ -34,7 +34,7 @@ namespace ICKIER_Furniture_Retailer_System
             DeliveryStatus = status;
         }
 
-        public string TrackDelivery()
+        public virtual string TrackDelivery()
         {
             return $"Tracking Number: {TrackingNumber} | Status: {DeliveryStatus}";
         }
