@@ -29,11 +29,11 @@ namespace ICKIER_Furniture_Retailer_System
 
         public override string GetDescription()
         {
-            return $"BookShelf: {name} ({material}, {height}x{width}cm, {shelfCount} shelves)";
+            return $"BookShelf: {Name} ({material}, {height}x{width}cm, {shelfCount} shelves)";
         }
         public override decimal GetPrice()
         {
-            return basePrice;
+            return BasePrice;
         }
     }
 }

@@ -51,16 +51,5 @@ namespace ICKIER_Furniture_Retailer_System
         {
             return children;
         }
-        //public override string Display()
-        //{
-        //    string output = name + "\n";
-
-        //    foreach (CatalogComponent child in children)
-        //    {
-        //        output += "  " + child.Display() + "\n";
-        //    }
-
-        //    return output;
-        //}
     }
 }

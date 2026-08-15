@@ -26,11 +26,11 @@ namespace ICKIER_Furniture_Retailer_System
 
         public override string GetDescription()
         {
-            return $"Table: {name} ({material}, {length}x{width}cm)";
+            return $"Table: {Name} ({material}, {length}x{width}cm)";
         }
         public override decimal GetPrice()
         {
-            return basePrice;
+            return BasePrice;
         }
     }
 }

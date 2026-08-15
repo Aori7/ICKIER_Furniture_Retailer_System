@@ -29,11 +29,6 @@ namespace ICKIER_Furniture_Retailer_System
         {
             throw new NotSupportedException();
         }
-
-        //public virtual string Display()
-        //{
-        //    throw new NotSupportedException();
-        //}
     }
 }
 

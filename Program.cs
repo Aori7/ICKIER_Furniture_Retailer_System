@@ -4,6 +4,58 @@
  */
 
 using ICKIER_Furniture_Retailer_System;
+using System.Collections;
+
+List<FurnitureItem> catalogue = new List<FurnitureItem>();
+
+// furniture collections
+FurnitureCollection bedroom = new FurnitureCollection(1, "Bedroom Collection", "Bedroom items");
+FurnitureCollection livingRoom = new FurnitureCollection(2, "Living Room Collection", "Living Room items");
+FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Office items");
+FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
+FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
+
+// making items
+FurnitureItem table1 = new FurnitureItem(1, "Table", 2000, "sturdy =material= table");
+FurnitureItem cabinet1 = new FurnitureItem(2, "Cabinet", 3000, "sturdy =material= Cabinet");
+FurnitureItem chair1 = new FurnitureItem(3, "Chair", 500, "sturdy =material= Chair");
+FurnitureItem bookshelf1 = new FurnitureItem(4, "Bookshelf", 2500, "sturdy =material= Bookshelf");
+FurnitureItem showerHead1 = new FurnitureItem(5, "Shower Head", 700, "sturdy Shower Head");
+FurnitureItem sink1 = new FurnitureItem(6, "Sink", 300, "sturdy =material= Sink");
+FurnitureItem stove1 = new FurnitureItem(7, "Stove", 600, "sturdy Stove");
+FurnitureItem door1 = new FurnitureItem(8, "Door", 200, "sturdy =material= Door");
+FurnitureItem bed1 = new FurnitureItem(9, "Bed", 15000, "sturdy =material= Bed");
+FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= Sofa");
+
+
+// adding items into collection
+bedroom.Add(bed1);
+bedroom.Add(bookshelf1);
+bedroom.Add(door1);
+
+livingRoom.Add(table1);
+livingRoom.Add(sofa1);
+livingRoom.Add(chair1);
+
+office.Add(table1);
+office.Add(chair1);
+office.Add(bookshelf1);
+office.Add(door1);
+
+kitchen.Add(sink1);
+kitchen.Add(stove1);
+
+bathroom.Add(showerHead1);
+bathroom.Add(sink1);
+bathroom.Add(door1);
+
+
+
+// list of collections
+List<FurnitureCollection> Catalogue = new List<FurnitureCollection>
+{
+    bedroom, livingRoom, office, kitchen, bathroom
+};
 
 // Sample data setup
 List<Order> orderHistory = new List<Order>();
@@ -11,36 +63,6 @@ Order? lastOrder = null;
 List<(FurnitureItem item, int qty)> lastOrderItems =
     new List<(FurnitureItem item, int qty)>();
 int orderCounter = 1001;
-
-// factory method
-FurnitureCreator tableCreator = new TableCreator();
-FurnitureCreator chairCreator = new ChairCreator();
-FurnitureCreator bookshelfCreator = new BookshelfCreator();
-// abstract Factory
-FurnitureFactory pineFactory = new PineFurnitureFactory();
-FurnitureFactory oakFactory = new OakFurnitureFactory();
-FurnitureFactory steelFactory = new SteelFurnitureFactory();
-
-List<FurnitureItem> catalogue = new List<FurnitureItem>
-{
-    // factory method products
-    tableCreator.CreateFurniture(),
-    chairCreator.CreateFurniture(),
-    bookshelfCreator.CreateFurniture(),
-
-    // abstract Factory product families
-    pineFactory.CreateTable(),
-    pineFactory.CreateChair(),
-    pineFactory.CreateBookShelf(),
-
-    oakFactory.CreateTable(),
-    oakFactory.CreateChair(),
-    oakFactory.CreateBookShelf(),
-
-    steelFactory.CreateTable(),
-    steelFactory.CreateChair(),
-    steelFactory.CreateBookShelf()
-};
 
 // Sample cart
 List<(FurnitureItem item, int qty)> cart = new List<(FurnitureItem, int)>();
@@ -114,156 +136,152 @@ while (running)
 }
 
 // ─── Option 1: Browse Furniture ───────────────────────────────────────
+// browse collection & select
+// browse items under collection & select
+// display detials of item & select to add to cart
+// display and select add ons
 void BrowseFurniture()
 {
     bool back = false;
     while (!back)
     {
-       
-
-        Console.WriteLine("=== Browse Furniture ===\n");
+        Console.WriteLine();
+        Console.WriteLine("=== Browse Furniture ===");
         Console.WriteLine("Select Furniture Collection:");
-        Console.WriteLine("1. Living Room Collection");
-        Console.WriteLine("2. Bedroom Collection");
-        Console.WriteLine("3. Office Collection");
-        Console.WriteLine("0. Back");
-        Console.Write("\nEnter your choice: ");
-        string col = Console.ReadLine() ?? "";
-
-        List<FurnitureItem> collection = new List<FurnitureItem>();
-        string collectionName = "";
-
-        switch (col)
+        for (int i = 0; i < Catalogue.Count; i++)
         {
-            case "1":
-                collectionName = "Living Room Collection";
-                collection = catalogue.Where(f => f is Table || f is Chair).ToList();
-                break;
-            case "2":
-                collectionName = "Bedroom Collection";
-                collection = catalogue.Where(f => f is BookShelf).ToList();
-                break;
-            case "3":
-                collectionName = "Office Collection";
-                collection = catalogue.Where(f => f is Table || f is Chair).ToList();
-                break;
-            case "0":
-                back = true;
-                continue;
-            default:
-                Console.WriteLine("Invalid choice. Please try again.");
-                continue;
+            Console.WriteLine($"{i+1}. {Catalogue[i].Name}");
         }
-
-        Console.WriteLine($"=== {collectionName} ===\n");
-        for (int i = 0; i < collection.Count; i++)
-            Console.WriteLine($"{i + 1}. {collection[i].GetDescription()} - ${collection[i].GetPrice():N2}");
-
-        Console.WriteLine("\nChoose Product Type:");
-        Console.WriteLine("1. Table");
-        Console.WriteLine("2. Chair");
-        Console.WriteLine("3. BookShelf");
         Console.WriteLine("0. Back");
-        Console.Write("\nEnter your choice: "); 
-        string typeChoice = Console.ReadLine() ?? "";
+        Console.Write("Enter your choice: ");
 
-        List<FurnitureItem> filtered = new List<FurnitureItem>();
-        switch (typeChoice)
+        string input = Console.ReadLine();
+
+        if (input == "0")
         {
-            case "1": filtered = collection.Where(f => f is Table).ToList(); break;
-            case "2": filtered = collection.Where(f => f is Chair).ToList(); break;
-            case "3": filtered = collection.Where(f => f is BookShelf).ToList(); break;
-            case "0": continue;
-            default:
-                Console.WriteLine("Invalid choice. Please try again.");
-                continue;
+            return;
         }
-
-       
-        Console.WriteLine($"=== {collectionName} ===\n");
-        for (int i = 0; i < filtered.Count; i++)
+        else if (!int.TryParse(input, out int choice))
         {
-            Console.WriteLine($"{i + 1}. {filtered[i].Name}");
-            Console.WriteLine($"   {filtered[i].GetDescription()}");
-            Console.WriteLine($"   Price: ${filtered[i].GetPrice():N2}");
+            Console.WriteLine("Please enter a valid number.");
+            continue;
+        }
+        else if (choice < 1 || choice > Catalogue.Count)
+        {
+            Console.WriteLine("Invalid collection.");
+            continue;
+        }
+        else // 
+        {
+            FurnitureCollection collection = Catalogue[choice - 1];
+
             Console.WriteLine();
-        }
-
-        Console.WriteLine("Would you like to add an item to cart?");
-        Console.Write("Enter item number (or 0 to go back): ");
-        string itemChoice = Console.ReadLine() ?? "";
-
-        if (itemChoice == "0") continue;
-
-        if (int.TryParse(itemChoice, out int itemIdx) && itemIdx >= 1 && itemIdx <= filtered.Count)
-        {
-            FurnitureItem selected = filtered[itemIdx - 1];
-
-            while (true)
+            Console.WriteLine($"=== {collection.Name} ===");
+            int i = 0;
+            foreach (FurnitureItem fi in collection.Children)
             {
-                Console.WriteLine("\nAdd-ons:");
-                Console.WriteLine("1. Add Warranty (+$49.99)");
-                Console.WriteLine("2. Add Installation (+$79.99)");
-                Console.WriteLine("3. Add Both");
-                Console.WriteLine("0. No add-ons");
-                Console.Write("Enter choice: ");
-
-                string addon = Console.ReadLine() ?? "";
-
-                switch (addon)
-                {
-                    case "1":
-                        selected = new WarrantyDecorator(selected, 49.99m);
-                        break;
-
-                    case "2":
-                        selected = new InstallationDecorator(selected, 79.99m);
-                        break;
-
-                    case "3":
-                        selected = new WarrantyDecorator(selected, 49.99m);
-                        selected = new InstallationDecorator(selected, 79.99m);
-                        break;
-
-                    case "0":
-                        break;
-
-                    default:
-                        Console.WriteLine("Invalid add-on choice. Please enter 0, 1, 2, or 3.");
-                        continue;
-                }
-
-                break;
+                i += 1;
+                Console.WriteLine($"{i}. {fi.Name}");
             }
+            Console.WriteLine("0. Back");
+            Console.Write("Enter your choice: ");
+            string itemIndex = Console.ReadLine();
 
-            int qty;
-
-            while (true)
+            if (input == "0")
             {
-                Console.Write("Enter quantity: ");
-
-                if (int.TryParse(Console.ReadLine(), out qty) && qty > 0)
-                {
-                    break;
-                }
-
-                Console.WriteLine(
-                    "Invalid quantity. Please enter a whole number greater than 0."
-                );
+                return;
             }
+            else if (!int.TryParse(input, out int choice2))
+            {
+                Console.WriteLine("Please enter a valid number.");
+                continue;
+            }
+            else if (choice2 < 1 || choice2 > collection.Children.Count)
+            {
+                Console.WriteLine("Invalid furniture item.");
+                continue;
+            }
+            else
+            {
+                FurnitureItem item = (FurnitureItem) collection.Children[choice2 - 1];
 
-            cart.Add((selected, qty));
-            Console.WriteLine(
-                $"\n{selected.Name} x{qty} added to cart!"
-            );
-        }
-        else
-        {
-            Console.WriteLine(
-                $"Invalid item number. Please enter a number from 1 to {filtered.Count}, or 0 to go back."
-            );
-        }
+                while (true)
+                {
+                    Console.WriteLine();
+                    Console.WriteLine($"=== {item.Name} ===");
+                    Console.WriteLine($"Price: ${item.BasePrice:F2}");
+                    Console.WriteLine($"Description: {item.Description}");
+                    Console.Write($"Add item to cart? Y/N: ");
+                    string decision = Console.ReadLine();
 
+                    if (decision.ToUpper() == "N")
+                    {
+                        break; // goes back to displaying items of selected collection
+                    }
+                    else if (decision.ToUpper() == "Y")
+                    {
+                        FurnitureItem selected = item;
+
+                        while (true)
+                        {
+                            Console.WriteLine("\nAdd-ons:");
+                            Console.WriteLine("1. Add Warranty (+$49.99)");
+                            Console.WriteLine("2. Add Installation (+$79.99)");
+                            Console.WriteLine("3. Add Both");
+                            Console.WriteLine("0. No add-ons");
+                            Console.Write("Enter choice: ");
+                            string addon = Console.ReadLine() ?? "";
+
+                            switch (addon)
+                            {
+                                case "1":
+                                    selected = new WarrantyDecorator(selected, 49.99m);
+                                    break;
+
+                                case "2":
+                                    selected = new InstallationDecorator(selected, 79.99m);
+                                    break;
+
+                                case "3":
+                                    selected = new WarrantyDecorator(selected, 49.99m);
+                                    selected = new InstallationDecorator(selected, 79.99m);
+                                    break;
+
+                                case "0":
+                                    break;
+
+                                default:
+                                    Console.WriteLine("Invalid add-on choice. Please enter 0, 1, 2, or 3.");
+                                    continue;
+                            }
+                            break;
+                        }
+
+                        int qty;
+
+                        while (true)
+                        {
+                            Console.Write("Enter quantity: ");
+
+                            if (int.TryParse(Console.ReadLine(), out qty) && qty > 0)
+                            {
+                                break;
+                            }
+
+                            Console.WriteLine("Invalid quantity. Please enter a whole number greater than 0.");
+                        }
+
+                        cart.Add((selected, qty));
+                        Console.WriteLine($"\n{selected.Name} x{qty} added to cart!");
+                        break;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid input");
+                    }
+                }
+            }
+        }
     }
 }
 

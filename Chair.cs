@@ -23,11 +23,11 @@ namespace ICKIER_Furniture_Retailer_System
 
         public override string GetDescription()
         {
-            return $"Chair: {name} ({material}, {height}cm)";
+            return $"Chair: {Name} ({material}, {height}cm)";
         }
         public override decimal GetPrice()
         {
-            return basePrice;
+            return BasePrice;
         }
     }
 }
