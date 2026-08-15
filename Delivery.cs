@@ -28,13 +28,16 @@ namespace ICKIER_Furniture_Retailer_System
             TrackingNumber = trackingNumber;
             DeliveryStatus = "Scheduled";
         }
-
+        public virtual void ScheduleDelivery()
+        {
+            Console.WriteLine($"Delivery scheduled to {DeliveryAddress} on {ScheduledDate:dd/MM/yyyy}.");
+        }
         public void UpdateStatus(string status)
         {
             DeliveryStatus = status;
         }
 
-        public string TrackDelivery()
+        public virtual string TrackDelivery()
         {
             return $"Tracking Number: {TrackingNumber} | Status: {DeliveryStatus}";
         }
