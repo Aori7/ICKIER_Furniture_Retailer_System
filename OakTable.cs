@@ -8,7 +8,7 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class OakTable : Table
     {
-        public OakTable() : base(103, "Oak Table", 200m, "A sturdy oak table.", "Oak", 120, 60)
+        public OakTable(int furnitureId, string name, decimal basePrice, string description, double length, double width) : base(furnitureId, name, basePrice, description, "Oak", length, width)
         {
         }
     }

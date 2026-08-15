@@ -8,7 +8,7 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class OakChair: Chair
     {
-        public OakChair() : base(104, "Oak Chair", 100m, "A comfortable oak chair.", "Oak", 90)
+        public OakChair(int furnitureId, string name, decimal basePrice, string description, double height) : base(furnitureId, name, basePrice, description, "Oak", height)
         {
         }
     }

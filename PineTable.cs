@@ -8,7 +8,7 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public class PineTable : Table
     {
-        public PineTable() :base(101, "Pine Table", 150m, "A sturdy pine table.", "Pine", 120, 60)
+        public PineTable(int furnitureId, string name, decimal basePrice, string description, double length, double width) : base(furnitureId, name, basePrice, description, "Pine", length, width)
         {
         }
     }
