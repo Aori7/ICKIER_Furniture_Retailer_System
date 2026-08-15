@@ -15,6 +15,11 @@ FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Of
 FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
 FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
 
+// create material factories
+FurnitureFactory oakFactory = new OakFurnitureFactory();
+FurnitureFactory pineFactory = new PineFurnitureFactory();
+FurnitureFactory steelFactory = new SteelFurnitureFactory();
+
 // making items
 FurnitureItem table1 = new FurnitureItem(1, "Table", 2000, "sturdy =material= table");
 FurnitureItem cabinet1 = new FurnitureItem(2, "Cabinet", 3000, "sturdy =material= Cabinet");
@@ -48,7 +53,6 @@ kitchen.Add(stove1);
 bathroom.Add(showerHead1);
 bathroom.Add(sink1);
 bathroom.Add(door1);
-
 
 
 // list of collections
@@ -150,7 +154,7 @@ void BrowseFurniture()
         Console.WriteLine("Select Furniture Collection:");
         for (int i = 0; i < Catalogue.Count; i++)
         {
-            Console.WriteLine($"{i+1}. {Catalogue[i].Name}");
+            Console.WriteLine($"{i + 1}. {Catalogue[i].Name}");
         }
         Console.WriteLine("0. Back");
         Console.Write("Enter your choice: ");
@@ -187,11 +191,11 @@ void BrowseFurniture()
             Console.Write("Enter your choice: ");
             string itemIndex = Console.ReadLine();
 
-            if (input == "0")
+            if (itemIndex == "0")
             {
-                return;
+                continue;
             }
-            else if (!int.TryParse(input, out int choice2))
+            else if (!int.TryParse(itemIndex, out int choice2))
             {
                 Console.WriteLine("Please enter a valid number.");
                 continue;
@@ -203,14 +207,74 @@ void BrowseFurniture()
             }
             else
             {
-                FurnitureItem item = (FurnitureItem) collection.Children[choice2 - 1];
+                FurnitureItem item = (FurnitureItem)collection.Children[choice2 - 1];
+                FurnitureItem selected = item;
+
+                //customisable furnitures
+                if (item.Name == "Table" || item.Name == "Chair" || item.Name == "Bookshelf")
+                {
+                    Console.WriteLine("\nCustomise Furniture");
+                    Console.WriteLine("Choose Furniture Material:");
+                    Console.WriteLine("1.Oak");
+                    Console.WriteLine("2.Pine");
+                    Console.WriteLine("3.Steel");
+                    Console.WriteLine("Enter Choice:");
+                    string materialChoice = Console.ReadLine() ?? "";
+
+                    FurnitureFactory fact;
+                    if (materialChoice == "1")
+                    {
+                        fact = oakFactory;
+                    }
+                    else if (materialChoice == "2")
+                    {
+                        fact = pineFactory;
+                    }
+                    else if (materialChoice == "3")
+                    {
+                        fact = steelFactory;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Invalid material.");
+                        continue;
+                    }
+
+                    //handle dimensions
+                    if (item.Name == "Table") //input length,width
+                    {
+                        Console.Write("Enter length (cm): ");
+                        double length = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Enter width (cm): ");
+                        double width = Convert.ToDouble(Console.ReadLine());
+
+                        selected = fact.CreateTable(length, width);
+                    }
+                    else if (item.Name == "Chair") //height
+                    {
+                        Console.Write("Enter height (cm): ");
+                        double height = Convert.ToDouble(Console.ReadLine());
+                        selected = fact.CreateChair(height);
+                    }
+                    else if (item.Name == "Bookshelf") //height width shelfcount
+                    {
+                        Console.Write("Enter height (cm): ");
+                        double height = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Enter width (cm): ");
+                        double width = Convert.ToDouble(Console.ReadLine());
+                        Console.Write("Enter number of shelves: ");
+                        int shelfCount = Convert.ToInt32(Console.ReadLine());
+
+                        selected = fact.CreateBookShelf(height, width, shelfCount);
+                    }
+                }
 
                 while (true)
                 {
                     Console.WriteLine();
-                    Console.WriteLine($"=== {item.Name} ===");
-                    Console.WriteLine($"Price: ${item.BasePrice:F2}");
-                    Console.WriteLine($"Description: {item.Description}");
+                    Console.WriteLine($"=== {selected.Name} ==="); //print out the customised furniture details
+                    Console.WriteLine($"Price: ${selected.GetPrice():F2}");
+                    Console.WriteLine($"Description: {selected.Description}");
                     Console.Write($"Add item to cart? Y/N: ");
                     string decision = Console.ReadLine();
 
@@ -220,7 +284,7 @@ void BrowseFurniture()
                     }
                     else if (decision.ToUpper() == "Y")
                     {
-                        FurnitureItem selected = item;
+                        //FurnitureItem selected = item;
 
                         while (true)
                         {
@@ -285,78 +349,183 @@ void BrowseFurniture()
     }
 }
 
-// ─── Option 2: Search Furniture ───────────────────────────────────────
-void SearchFurniture()
-{
-    while (true)
+
+    // ─── Option 2: Search Furniture ───────────────────────────────────────
+    void SearchFurniture()
     {
-        Console.WriteLine();
-        Console.WriteLine("=== Search Furniture ===");
-        Console.WriteLine();
-        Console.Write("Which furniture are you looking for? (Enter 0 to go back): ");
-        string keyword = (Console.ReadLine() ?? "").ToLower();
-        if (keyword == "0")
+        while (true)
         {
-            return;
-        }
-
-        var results = catalogue.Where(f =>
-        f.Name.ToLower().Contains(keyword) ||
-        f.GetDescription().ToLower().Contains(keyword)).ToList();
-
-
-        if (results.Count == 0)
-        {
-            Console.WriteLine($"No results found for \"{keyword}\".");
-        }
-        else
-        {
-            Console.WriteLine($"=== Search Results for \"{keyword}\" ===\n");
-            for (int i = 0; i < results.Count; i++)
+            Console.WriteLine();
+            Console.WriteLine("=== Search Furniture ===");
+            Console.WriteLine();
+            Console.Write("Which furniture are you looking for? (Enter 0 to go back): ");
+            string keyword = (Console.ReadLine() ?? "").ToLower();
+            if (keyword == "0")
             {
-                Console.WriteLine($"{i + 1}. {results[i].Name}");
-                Console.WriteLine($"   {results[i].GetDescription()}");
-                Console.WriteLine($"   Price: ${results[i].GetPrice():N2}");
-                Console.WriteLine();
+                return;
             }
 
-            Console.Write("Enter item number to add to cart (or 0 to search again): ");
-            string itemChoice = Console.ReadLine() ?? "";
+            var results = catalogue.Where(f =>
+            f.Name.ToLower().Contains(keyword) ||
+            f.GetDescription().ToLower().Contains(keyword)).ToList();
 
-            if (itemChoice == "0")
+
+            if (results.Count == 0)
             {
-                continue;
-            }
-
-            if (int.TryParse(itemChoice, out int itemIdx) &&
-                itemIdx >= 1 &&
-                itemIdx <= results.Count)
-            {
-                cart.Add((results[itemIdx - 1], 1));
-
-                Console.WriteLine(
-                    $"\n{results[itemIdx - 1].Name} x1 added to cart!"
-                );
+                Console.WriteLine($"No results found for \"{keyword}\".");
             }
             else
             {
-                Console.WriteLine(
-                    $"Invalid item number. Please enter a number from 1 to {results.Count}, or 0 to search again."
-                );
+                Console.WriteLine($"=== Search Results for \"{keyword}\" ===\n");
+                for (int i = 0; i < results.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {results[i].Name}");
+                    Console.WriteLine($"   {results[i].GetDescription()}");
+                    Console.WriteLine($"   Price: ${results[i].GetPrice():N2}");
+                    Console.WriteLine();
+                }
+
+                Console.Write("Enter item number to add to cart (or 0 to search again): ");
+                string itemChoice = Console.ReadLine() ?? "";
+
+                if (itemChoice == "0")
+                {
+                    continue;
+                }
+
+                if (int.TryParse(itemChoice, out int itemIdx) &&
+                    itemIdx >= 1 &&
+                    itemIdx <= results.Count)
+                {
+                    cart.Add((results[itemIdx - 1], 1));
+
+                    Console.WriteLine(
+                        $"\n{results[itemIdx - 1].Name} x1 added to cart!"
+                    );
+                }
+                else
+                {
+                    Console.WriteLine(
+                        $"Invalid item number. Please enter a number from 1 to {results.Count}, or 0 to search again."
+                    );
+                }
+            }
+        }
+
+    }
+
+    // ─── Option 3: View Cart ──────────────────────────────────────────────
+    void ViewCart()
+    {
+        bool back = false;
+        while (!back)
+        {
+
+            Console.WriteLine("=== Shopping Cart ===\n");
+
+            if (cart.Count == 0)
+            {
+                Console.WriteLine("Your cart is empty! Please add items first.");
+                return;
+            }
+
+            decimal total = 0;
+            for (int i = 0; i < cart.Count; i++)
+            {
+                decimal subtotal = cart[i].item.GetPrice() * cart[i].qty;
+                total += subtotal;
+                Console.WriteLine($"{i + 1}. {cart[i].item.Name} x{cart[i].qty}   ${subtotal:N2}");
+            }
+            Console.WriteLine($"\nTotal: ${total:N2}");
+            Console.WriteLine("\n1. Remove Item");
+            Console.WriteLine("2. Change Quantity");
+            Console.WriteLine("3. Checkout");
+            Console.WriteLine("0. Back");
+            Console.Write("\nEnter your choice: ");
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1":
+                    Console.Write("Enter item number to remove: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int removeIdx) &&
+                        removeIdx >= 1 && removeIdx <= cart.Count)
+                    {
+                        Console.WriteLine(
+                            $"{cart[removeIdx - 1].item.Name} removed from cart."
+                        );
+
+                        cart.RemoveAt(removeIdx - 1);
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            $"Invalid item number. Please enter a number from 1 to {cart.Count}."
+                        );
+                    }
+
+                    break;
+
+                case "2":
+                    Console.Write("Enter item number to change quantity: ");
+
+                    if (int.TryParse(Console.ReadLine(), out int qtyIdx) &&
+                        qtyIdx >= 1 &&
+                        qtyIdx <= cart.Count)
+                    {
+                        Console.Write("Enter new quantity: ");
+
+                        if (int.TryParse(Console.ReadLine(), out int newQty) &&
+                            newQty > 0)
+                        {
+                            var item = cart[qtyIdx - 1];
+
+                            cart[qtyIdx - 1] =
+                                (item.item, newQty);
+
+                            Console.WriteLine(
+                                $"Quantity updated to {newQty}."
+                            );
+                        }
+                        else
+                        {
+                            Console.WriteLine(
+                                "Invalid quantity. Please enter a whole number greater than 0."
+                            );
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            $"Invalid item number. Please enter a number from 1 to {cart.Count}."
+                        );
+                    }
+
+                    break;
+
+                case "3":
+                    Checkout();
+                    back = true;
+                    break;
+
+                case "0":
+                    back = true;
+                    break;
+
+                default:
+                    Console.WriteLine(
+                        "Invalid option. Please enter 0, 1, 2, or 3."
+                    );
+                    break;
             }
         }
     }
-   
-}
 
-// ─── Option 3: View Cart ──────────────────────────────────────────────
-void ViewCart()
-{
-    bool back = false;
-    while (!back)
+    // ─── Option 4: Checkout ───────────────────────────────────────────────
+    void Checkout()
     {
-    
-        Console.WriteLine("=== Shopping Cart ===\n");
+        Console.WriteLine("=== Checkout ===\n");
 
         if (cart.Count == 0)
         {
@@ -364,890 +533,786 @@ void ViewCart()
             return;
         }
 
-        decimal total = 0;
-        for (int i = 0; i < cart.Count; i++)
+        // Delivery address
+        string address;
+
+        while (true)
         {
-            decimal subtotal = cart[i].item.GetPrice() * cart[i].qty;
-            total += subtotal;
-            Console.WriteLine($"{i + 1}. {cart[i].item.Name} x{cart[i].qty}   ${subtotal:N2}");
-        }
-        Console.WriteLine($"\nTotal: ${total:N2}");
-        Console.WriteLine("\n1. Remove Item");
-        Console.WriteLine("2. Change Quantity");
-        Console.WriteLine("3. Checkout");
-        Console.WriteLine("0. Back");
-        Console.Write("\nEnter your choice: ");
-        string choice = Console.ReadLine() ?? "";
+            Console.WriteLine("Enter Delivery Address");
+            Console.WriteLine("Format example: Blk 123 Clementi Ave 3, #05-10, Singapore 120123");
+            Console.Write("Address: ");
 
-        switch (choice)
-        {
-            case "1":
-                Console.Write("Enter item number to remove: ");
+            address = Console.ReadLine() ?? "";
 
-                if (int.TryParse(Console.ReadLine(), out int removeIdx) &&
-                    removeIdx >= 1 && removeIdx <= cart.Count)
-                {
-                    Console.WriteLine(
-                        $"{cart[removeIdx - 1].item.Name} removed from cart."
-                    );
+            if (string.IsNullOrWhiteSpace(address))
+            {
+                Console.WriteLine("Delivery address cannot be empty.");
+                Console.WriteLine();
+                continue;
+            }
 
-                    cart.RemoveAt(removeIdx - 1);
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"Invalid item number. Please enter a number from 1 to {cart.Count}."
-                    );
-                }
+            if (address.Length < 5)
+            {
+                Console.WriteLine("Please enter a valid delivery address.");
+                Console.WriteLine();
+                continue;
+            }
 
-                break;
-
-            case "2":
-                Console.Write("Enter item number to change quantity: ");
-
-                if (int.TryParse(Console.ReadLine(), out int qtyIdx) &&
-                    qtyIdx >= 1 &&
-                    qtyIdx <= cart.Count)
-                {
-                    Console.Write("Enter new quantity: ");
-
-                    if (int.TryParse(Console.ReadLine(), out int newQty) &&
-                        newQty > 0)
-                    {
-                        var item = cart[qtyIdx - 1];
-
-                        cart[qtyIdx - 1] =
-                            (item.item, newQty);
-
-                        Console.WriteLine(
-                            $"Quantity updated to {newQty}."
-                        );
-                    }
-                    else
-                    {
-                        Console.WriteLine(
-                            "Invalid quantity. Please enter a whole number greater than 0."
-                        );
-                    }
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"Invalid item number. Please enter a number from 1 to {cart.Count}."
-                    );
-                }
-
-                break;
-
-            case "3":
-                Checkout();
-                back = true;
-                break;
-
-            case "0":
-                back = true;
-                break;
-
-            default:
-                Console.WriteLine(
-                    "Invalid option. Please enter 0, 1, 2, or 3."
-                );
-                break;
-        }
-    }
-}
-
-// ─── Option 4: Checkout ───────────────────────────────────────────────
-void Checkout()
-{
-    Console.WriteLine("=== Checkout ===\n");
-
-    if (cart.Count == 0)
-    {
-        Console.WriteLine("Your cart is empty! Please add items first.");
-        return;
-    }
-
-    // Delivery address
-    string address;
-
-    while (true)
-    {
-        Console.WriteLine("Enter Delivery Address");
-        Console.WriteLine("Format example: Blk 123 Clementi Ave 3, #05-10, Singapore 120123");
-        Console.Write("Address: ");
-
-        address = Console.ReadLine() ?? "";
-
-        if (string.IsNullOrWhiteSpace(address))
-        {
-            Console.WriteLine("Delivery address cannot be empty.");
-            Console.WriteLine();
-            continue;
+            break;
         }
 
-        if (address.Length < 5)
+        // Delivery date
+        DateTime deliveryDate;
+
+        while (true)
         {
-            Console.WriteLine("Please enter a valid delivery address.");
-            Console.WriteLine();
-            continue;
-        }
+            Console.Write("Select Preferred Delivery Date (dd/MM/yyyy): ");
+            string dateInput = Console.ReadLine() ?? "";
 
-        break;
-    }
-
-    // Delivery date
-    DateTime deliveryDate;
-
-    while (true)
-    {
-        Console.Write("Select Preferred Delivery Date (dd/MM/yyyy): ");
-        string dateInput = Console.ReadLine() ?? "";
-
-        bool validDate = DateTime.TryParseExact(
-            dateInput,
-            "dd/MM/yyyy",
-            null,
-            System.Globalization.DateTimeStyles.None,
-            out deliveryDate
-        );
-
-        if (!validDate)
-        {
-            Console.WriteLine(
-                "Invalid date format. Please enter the date as dd/MM/yyyy."
+            bool validDate = DateTime.TryParseExact(
+                dateInput,
+                "dd/MM/yyyy",
+                null,
+                System.Globalization.DateTimeStyles.None,
+                out deliveryDate
             );
-            continue;
-        }
 
-        if (deliveryDate.Date <= DateTime.Today)
-        {
-            Console.WriteLine(
-                "Delivery date must be a future date."
-            );
-            continue;
-        }
-
-        break;
-    }
-
-    Console.WriteLine("\nConnecting to external delivery provider...");
-    Console.WriteLine(
-        $"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM"
-    );
-
-    // Calculate total
-    decimal total = cart.Sum(c => c.item.GetPrice() * c.qty);
-
-    // Strategy Pattern - Payment
-    Payment payment = new Payment(orderCounter, total);
-    
-    Console.WriteLine();
-
-    bool paymentSuccessful = false;
-
-    while (!paymentSuccessful)
-    {
-        Console.WriteLine("\nSelect Payment Method:");
-        Console.WriteLine("1. Credit Card");
-        Console.WriteLine("2. PayPal");
-        Console.WriteLine("3. Cash on Delivery");
-        Console.WriteLine("0. Cancel Checkout");
-        Console.Write("\nEnter your choice: ");
-
-        string payChoice = Console.ReadLine() ?? "";
-
-        switch (payChoice)
-        {
-            case "1":
-                Console.Write("Enter card number: ");
-                string cardNumber = Console.ReadLine() ?? "";
-
-                payment.SetPaymentStrategy(
-                    new CreditCardPayment(cardNumber)
-                );
-                break;
-
-            case "2":
-                Console.Write("Enter PayPal email: ");
-                string email = Console.ReadLine() ?? "";
-
-                payment.SetPaymentStrategy(
-                    new PayPalPayment(email)
-                );
-                break;
-
-            case "3":
-                payment.SetPaymentStrategy(
-                    new CashOnDeliveryPayment()
-                );
-                break;
-
-            case "0":
-                Console.WriteLine("Checkout cancelled. Your cart has been kept.");
-                return;
-
-            default:
+            if (!validDate)
+            {
                 Console.WriteLine(
-                    "Invalid payment method. Please try again."
+                    "Invalid date format. Please enter the date as dd/MM/yyyy."
                 );
                 continue;
-        }
+            }
 
-        Console.WriteLine();
-
-        paymentSuccessful = payment.ProcessPayment();
-
-        if (!paymentSuccessful)
-        {
-            Console.WriteLine();
-            Console.WriteLine(
-                "Please select a payment method and try again."
-            );
-        }
-    }
-
-    // Create order
-    Order newOrder = new Order(orderCounter++);
-    newOrder.SetPayment(payment);
-    Delivery delivery = new Delivery(
-    newOrder.OrderId,
-    address,
-    deliveryDate,
-    $"TRK{newOrder.OrderId}"
-    );
-
-    newOrder.SetDelivery(delivery);
-    foreach (var (item, qty) in cart)
-    {
-        newOrder.addItem(
-            new OrderItem(
-                item.FurnitureId,
-                qty,
-                item.GetPrice()
-            )
-        );
-    }
-
-    newOrder.PlaceOrder();
-    newOrder.MakePayment();
-
-    orderHistory.Insert(0, newOrder);
-    lastOrder = newOrder;
-
-    Console.WriteLine();
-    Console.WriteLine("================================");
-    Console.WriteLine("       ORDER CONFIRMED");
-    Console.WriteLine("================================");
-
-    Console.WriteLine($"Order ID: ORD{newOrder.OrderId}");
-    Console.WriteLine($"Total Amount: ${total:N2}");
-    Console.WriteLine($"Order Status: {newOrder.Status}");
-
-    Console.WriteLine($"Payment Method: {payment.PaymentMethod}");
-
-    if (payment.IsCashOnDelivery)
-    {
-        Console.WriteLine("Payment Status: Pending Collection");
-    }
-    else
-    {
-        Console.WriteLine("Payment Status: Paid");
-    }
-
-    Console.WriteLine();
-    Console.WriteLine("Delivery Details:");
-    Console.WriteLine($"Address: {delivery.DeliveryAddress}");
-    Console.WriteLine($"Preferred Delivery Date: {delivery.ScheduledDate:dd/MM/yyyy}");
-    Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-    Console.WriteLine($"Tracking Number: {delivery.TrackingNumber}");
-
-    Console.WriteLine("================================");
-
-    cart.Clear();
-}
-
-// ─── Option 5: View Order History ─────────────────────────────────────
-void ViewOrderHistory()
-{
-    bool back = false;
-    while (!back)
-    {
-       
-        Console.WriteLine("=== Order History ===\n");
-
-        if (orderHistory.Count == 0)
-        {
-            Console.WriteLine("No order history found.");
-            return;
-        }
-
-        for (int i = 0; i < orderHistory.Count; i++)
-        {
-            Console.WriteLine($"Order ID: ORD{orderHistory[i].OrderId}");
-            Console.WriteLine($"Status:   {orderHistory[i].Status}");
-            Console.WriteLine($"Total:    ${orderHistory[i].TotalAmount:N2}");
-            Console.WriteLine();
-        }
-
-        Console.WriteLine("How can we help you?");
-        Console.WriteLine("1. View Order Details");
-        Console.WriteLine("2. Cancel Order");
-        Console.WriteLine("3. Repeat Order");
-        Console.WriteLine("0. Back");
-        Console.Write("\nEnter your choice: ");
-        string choice = Console.ReadLine() ?? "";
-
-        switch (choice)
-        {
-            case "1":
-                ViewOrderDetails();
-                break;
-
-            case "2":
-                ManageOrder();
-                break;
-            case "3":
-                RepeatLastOrder();
-                back = true;
-                break;
-            case "0":
-                back = true;
-                break;
-
-            default:
+            if (deliveryDate.Date <= DateTime.Today)
+            {
                 Console.WriteLine(
-                    "Invalid option. Please enter 0, 1, 2, or 3."
+                    "Delivery date must be a future date."
                 );
-                break;
+                continue;
+            }
+
+            break;
         }
-    }
-}
 
-void ViewOrderDetails()
-{
-    Console.Write("Enter Order ID (e.g. ORD1001): ");
-
-    string input = (Console.ReadLine() ?? "")
-        .ToUpper()
-        .Replace("ORD", "");
-
-    if (!int.TryParse(input, out int orderId))
-    {
+        Console.WriteLine("\nConnecting to external delivery provider...");
         Console.WriteLine(
-            "Invalid Order ID. Please use a format such as ORD1001."
+            $"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM"
         );
-        return;
-    }
 
-    Order? found = orderHistory.FirstOrDefault(
-        o => o.OrderId == orderId
-    );
+        // Calculate total
+        decimal total = cart.Sum(c => c.item.GetPrice() * c.qty);
 
-    if (found == null)
-    {
-        Console.WriteLine("Order not found.");
-        return;
-    }
+        // Strategy Pattern - Payment
+        Payment payment = new Payment(orderCounter, total);
 
-    Console.WriteLine();
-    Console.WriteLine("=== Order Details ===");
-    Console.WriteLine($"Order ID: ORD{found.OrderId}");
-    Console.WriteLine($"Status:   {found.Status}");
-    Console.WriteLine($"Total:    ${found.TotalAmount:N2}");
-    if (found.Delivery != null)
-    {
         Console.WriteLine();
-        Console.WriteLine("Delivery Details:");
-        Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
-        Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
-        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-        Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-        Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
-    }
 
+        bool paymentSuccessful = false;
 
-    if (found.Payment != null)
-    {
-        Console.WriteLine($"Payment Method: {found.Payment.PaymentMethod}");
-        if (found.Payment.IsCashOnDelivery)
+        while (!paymentSuccessful)
         {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Cash on Delivery - Paid"
-                    : "Payment status: Cash on Delivery - Pending Collection"
+            Console.WriteLine("\nSelect Payment Method:");
+            Console.WriteLine("1. Credit Card");
+            Console.WriteLine("2. PayPal");
+            Console.WriteLine("3. Cash on Delivery");
+            Console.WriteLine("0. Cancel Checkout");
+            Console.Write("\nEnter your choice: ");
+
+            string payChoice = Console.ReadLine() ?? "";
+
+            switch (payChoice)
+            {
+                case "1":
+                    Console.Write("Enter card number: ");
+                    string cardNumber = Console.ReadLine() ?? "";
+
+                    payment.SetPaymentStrategy(
+                        new CreditCardPayment(cardNumber)
+                    );
+                    break;
+
+                case "2":
+                    Console.Write("Enter PayPal email: ");
+                    string email = Console.ReadLine() ?? "";
+
+                    payment.SetPaymentStrategy(
+                        new PayPalPayment(email)
+                    );
+                    break;
+
+                case "3":
+                    payment.SetPaymentStrategy(
+                        new CashOnDeliveryPayment()
+                    );
+                    break;
+
+                case "0":
+                    Console.WriteLine("Checkout cancelled. Your cart has been kept.");
+                    return;
+
+                default:
+                    Console.WriteLine(
+                        "Invalid payment method. Please try again."
+                    );
+                    continue;
+            }
+
+            Console.WriteLine();
+
+            paymentSuccessful = payment.ProcessPayment();
+
+            if (!paymentSuccessful)
+            {
+                Console.WriteLine();
+                Console.WriteLine(
+                    "Please select a payment method and try again."
+                );
+            }
+        }
+
+        // Create order
+        Order newOrder = new Order(orderCounter++);
+        newOrder.SetPayment(payment);
+        Delivery delivery = new Delivery(
+        newOrder.OrderId,
+        address,
+        deliveryDate,
+        $"TRK{newOrder.OrderId}"
+        );
+
+        newOrder.SetDelivery(delivery);
+        foreach (var (item, qty) in cart)
+        {
+            newOrder.addItem(
+                new OrderItem(
+                    item.FurnitureId,
+                    qty,
+                    item.GetPrice()
+                )
             );
+        }
+
+        newOrder.PlaceOrder();
+        newOrder.MakePayment();
+
+        orderHistory.Insert(0, newOrder);
+        lastOrder = newOrder;
+
+        Console.WriteLine();
+        Console.WriteLine("================================");
+        Console.WriteLine("       ORDER CONFIRMED");
+        Console.WriteLine("================================");
+
+        Console.WriteLine($"Order ID: ORD{newOrder.OrderId}");
+        Console.WriteLine($"Total Amount: ${total:N2}");
+        Console.WriteLine($"Order Status: {newOrder.Status}");
+
+        Console.WriteLine($"Payment Method: {payment.PaymentMethod}");
+
+        if (payment.IsCashOnDelivery)
+        {
+            Console.WriteLine("Payment Status: Pending Collection");
         }
         else
         {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Paid"
-                    : "Payment status: Not Paid"
-            );
+            Console.WriteLine("Payment Status: Paid");
         }
 
-        if (found.Payment.IsRefunded)
+        Console.WriteLine();
+        Console.WriteLine("Delivery Details:");
+        Console.WriteLine($"Address: {delivery.DeliveryAddress}");
+        Console.WriteLine($"Preferred Delivery Date: {delivery.ScheduledDate:dd/MM/yyyy}");
+        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+        Console.WriteLine($"Tracking Number: {delivery.TrackingNumber}");
+
+        Console.WriteLine("================================");
+
+        cart.Clear();
+    }
+
+    // ─── Option 5: View Order History ─────────────────────────────────────
+    void ViewOrderHistory()
+    {
+        bool back = false;
+        while (!back)
         {
-            Console.WriteLine("Refund Status: Refunded");
+
+            Console.WriteLine("=== Order History ===\n");
+
+            if (orderHistory.Count == 0)
+            {
+                Console.WriteLine("No order history found.");
+                return;
+            }
+
+            for (int i = 0; i < orderHistory.Count; i++)
+            {
+                Console.WriteLine($"Order ID: ORD{orderHistory[i].OrderId}");
+                Console.WriteLine($"Status:   {orderHistory[i].Status}");
+                Console.WriteLine($"Total:    ${orderHistory[i].TotalAmount:N2}");
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("How can we help you?");
+            Console.WriteLine("1. View Order Details");
+            Console.WriteLine("2. Cancel Order");
+            Console.WriteLine("3. Repeat Order");
+            Console.WriteLine("0. Back");
+            Console.Write("\nEnter your choice: ");
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1":
+                    ViewOrderDetails();
+                    break;
+
+                case "2":
+                    ManageOrder();
+                    break;
+                case "3":
+                    RepeatLastOrder();
+                    back = true;
+                    break;
+                case "0":
+                    back = true;
+                    break;
+
+                default:
+                    Console.WriteLine(
+                        "Invalid option. Please enter 0, 1, 2, or 3."
+                    );
+                    break;
+            }
         }
     }
-    Console.WriteLine();
-    Console.WriteLine("What would you like to do?");
-    Console.WriteLine("1. Manage This Order");
-    Console.WriteLine("0. Back");
-    Console.Write("Enter your choice: ");
 
-    string detailChoice = Console.ReadLine() ?? "";
-
-    if (detailChoice == "1")
+    void ViewOrderDetails()
     {
-        ManageOrder();
-    }
-}
-// ─── Option 6: Repeat Last Order ──────────────────────────────────────
-void RepeatLastOrder()
-{
-    
-    Console.WriteLine("=== Repeat Last Order ===\n");
+        Console.Write("Enter Order ID (e.g. ORD1001): ");
 
-    if (lastOrder == null)
-    {
-        Console.WriteLine("No previous order found.");
-       
-        return;
-    }
+        string input = (Console.ReadLine() ?? "")
+            .ToUpper()
+            .Replace("ORD", "");
 
-    Console.WriteLine($"Last Order: ORD{lastOrder.OrderId}");
-    Console.WriteLine($"Total: ${lastOrder.TotalAmount:N2}");
-    Console.WriteLine("\nRepeat this order?");
-    Console.WriteLine("1. Confirm");
-    Console.WriteLine("2. Cancel");
-    Console.WriteLine("0. Back");
-    Console.Write("\nEnter your choice: ");
-    string choice = Console.ReadLine() ?? "";
-
-    if (choice == "1")
-    {
-        if (lastOrderItems.Count == 0)
+        if (!int.TryParse(input, out int orderId))
         {
             Console.WriteLine(
-                "The previous order items could not be found."
+                "Invalid Order ID. Please use a format such as ORD1001."
             );
             return;
         }
 
-        cart.Clear();
+        Order? found = orderHistory.FirstOrDefault(
+            o => o.OrderId == orderId
+        );
 
-        foreach (var (item, qty) in lastOrderItems)
+        if (found == null)
         {
-            cart.Add((item, qty));
+            Console.WriteLine("Order not found.");
+            return;
         }
 
-        Console.WriteLine(
-            "\nPrevious order items have been added back to your cart."
-        );
-
-        Console.WriteLine(
-            "Please confirm delivery and payment details again."
-        );
-
-        Checkout();
-    }
-}
-
-// ─── Option 9: Manage Order ───────────────────────────────────────────
-void ManageOrder()
-{
-   
-    Console.WriteLine("=== Manage Order ===\n");
-
-    Console.Write("Enter Order ID (e.g. ORD1001): ");
-    string input = (Console.ReadLine() ?? "")
-    .ToUpper()
-    .Replace("ORD", "");
-
-    if (!int.TryParse(input, out int orderId))
-    {
-        Console.WriteLine(
-            "Invalid Order ID. Please use a format such as ORD1001."
-        );
-        return;
-    }
-
-    Order? found = orderHistory.FirstOrDefault(
-    o => o.OrderId == orderId
-    );
-
-    if (found == null)
-    {
-        Console.WriteLine("Order not found.");
-        return;
-    }
-
-    bool back = false;
-    while (!back)
-    {
-        
+        Console.WriteLine();
+        Console.WriteLine("=== Order Details ===");
         Console.WriteLine($"Order ID: ORD{found.OrderId}");
         Console.WriteLine($"Status:   {found.Status}");
-        Console.WriteLine($"Total:    ${found.TotalAmount:N2}\n");
-        Console.WriteLine("1. Cancel Order");
-        Console.WriteLine("2. Track Delivery");
-        Console.WriteLine("3. Process Next Delivery Stage");
+        Console.WriteLine($"Total:    ${found.TotalAmount:N2}");
+        if (found.Delivery != null)
+        {
+            Console.WriteLine();
+            Console.WriteLine("Delivery Details:");
+            Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
+            Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
+            Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+            Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
+            Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+        }
+
+
+        if (found.Payment != null)
+        {
+            Console.WriteLine($"Payment Method: {found.Payment.PaymentMethod}");
+            if (found.Payment.IsCashOnDelivery)
+            {
+                Console.WriteLine(
+                    found.Payment.IsPaid
+                        ? "Payment status: Cash on Delivery - Paid"
+                        : "Payment status: Cash on Delivery - Pending Collection"
+                );
+            }
+            else
+            {
+                Console.WriteLine(
+                    found.Payment.IsPaid
+                        ? "Payment status: Paid"
+                        : "Payment status: Not Paid"
+                );
+            }
+
+            if (found.Payment.IsRefunded)
+            {
+                Console.WriteLine("Refund Status: Refunded");
+            }
+        }
+        Console.WriteLine();
+        Console.WriteLine("What would you like to do?");
+        Console.WriteLine("1. Manage This Order");
+        Console.WriteLine("0. Back");
+        Console.Write("Enter your choice: ");
+
+        string detailChoice = Console.ReadLine() ?? "";
+
+        if (detailChoice == "1")
+        {
+            ManageOrder();
+        }
+    }
+    // ─── Option 6: Repeat Last Order ──────────────────────────────────────
+    void RepeatLastOrder()
+    {
+
+        Console.WriteLine("=== Repeat Last Order ===\n");
+
+        if (lastOrder == null)
+        {
+            Console.WriteLine("No previous order found.");
+
+            return;
+        }
+
+        Console.WriteLine($"Last Order: ORD{lastOrder.OrderId}");
+        Console.WriteLine($"Total: ${lastOrder.TotalAmount:N2}");
+        Console.WriteLine("\nRepeat this order?");
+        Console.WriteLine("1. Confirm");
+        Console.WriteLine("2. Cancel");
         Console.WriteLine("0. Back");
         Console.Write("\nEnter your choice: ");
         string choice = Console.ReadLine() ?? "";
 
-        switch (choice)
+        if (choice == "1")
         {
-            case "1":
-                Console.WriteLine($"\nCancel Order ORD{found.OrderId}?");
-                Console.WriteLine("1. Confirm");
-                Console.WriteLine("0. Back");
-                Console.Write("Enter your choice: ");
-                string confirm = Console.ReadLine() ?? "";
+            if (lastOrderItems.Count == 0)
+            {
+                Console.WriteLine(
+                    "The previous order items could not be found."
+                );
+                return;
+            }
 
-                if (confirm == "1")
-                {
-                    found.CancelOrder();
-                    if (found.Status == "Cancelled")
+            cart.Clear();
+
+            foreach (var (item, qty) in lastOrderItems)
+            {
+                cart.Add((item, qty));
+            }
+
+            Console.WriteLine(
+                "\nPrevious order items have been added back to your cart."
+            );
+
+            Console.WriteLine(
+                "Please confirm delivery and payment details again."
+            );
+
+            Checkout();
+        }
+    }
+
+    // ─── Option 9: Manage Order ───────────────────────────────────────────
+    void ManageOrder()
+    {
+
+        Console.WriteLine("=== Manage Order ===\n");
+
+        Console.Write("Enter Order ID (e.g. ORD1001): ");
+        string input = (Console.ReadLine() ?? "")
+        .ToUpper()
+        .Replace("ORD", "");
+
+        if (!int.TryParse(input, out int orderId))
+        {
+            Console.WriteLine(
+                "Invalid Order ID. Please use a format such as ORD1001."
+            );
+            return;
+        }
+
+        Order? found = orderHistory.FirstOrDefault(
+        o => o.OrderId == orderId
+        );
+
+        if (found == null)
+        {
+            Console.WriteLine("Order not found.");
+            return;
+        }
+
+        bool back = false;
+        while (!back)
+        {
+
+            Console.WriteLine($"Order ID: ORD{found.OrderId}");
+            Console.WriteLine($"Status:   {found.Status}");
+            Console.WriteLine($"Total:    ${found.TotalAmount:N2}\n");
+            Console.WriteLine("1. Cancel Order");
+            Console.WriteLine("2. Track Delivery");
+            Console.WriteLine("3. Process Next Delivery Stage");
+            Console.WriteLine("0. Back");
+            Console.Write("\nEnter your choice: ");
+            string choice = Console.ReadLine() ?? "";
+
+            switch (choice)
+            {
+                case "1":
+                    Console.WriteLine($"\nCancel Order ORD{found.OrderId}?");
+                    Console.WriteLine("1. Confirm");
+                    Console.WriteLine("0. Back");
+                    Console.Write("Enter your choice: ");
+                    string confirm = Console.ReadLine() ?? "";
+
+                    if (confirm == "1")
                     {
-                        Console.WriteLine("\nOrder cancelled successfully.");
-
-                        if (found.Payment != null)
+                        found.CancelOrder();
+                        if (found.Status == "Cancelled")
                         {
-                            if (found.Payment.IsPaid)
+                            Console.WriteLine("\nOrder cancelled successfully.");
+
+                            if (found.Payment != null)
                             {
-                                found.Payment.RefundPayment();
+                                if (found.Payment.IsPaid)
+                                {
+                                    found.Payment.RefundPayment();
+                                }
+                                else if (found.Payment.IsCashOnDelivery)
+                                {
+                                    Console.WriteLine(
+                                        "No refund is required because Cash on Delivery has not been collected."
+                                    );
+                                }
                             }
-                            else if (found.Payment.IsCashOnDelivery)
+                        }
+                        else
+                        {
+                            Console.WriteLine("\nCancellation unsuccessful.");
+
+                            if (found.Status == "Out for Delivery")
                             {
                                 Console.WriteLine(
-                                    "No refund is required because Cash on Delivery has not been collected."
+                                    "The order is already out for delivery."
+                                );
+                                Console.WriteLine(
+                                    "Cancellation and refund are no longer available."
+                                );
+                            }
+                            else if (found.Status == "Delivered")
+                            {
+                                Console.WriteLine(
+                                    "The order has already been delivered and cannot be cancelled."
+                                );
+                            }
+                            else
+                            {
+                                Console.WriteLine(
+                                    $"Order cannot be cancelled while its status is {found.Status}."
                                 );
                             }
                         }
                     }
+
+                    back = true;
+                    break;
+                case "2":
+                    Console.WriteLine($"\n=== Track Delivery ORD{found.OrderId} ===");
+
+                    Console.WriteLine($"Order Status: {found.Status}");
+
+                    if (found.Delivery != null)
+                    {
+                        Console.WriteLine($"Delivery Address: {found.Delivery.DeliveryAddress}");
+                        Console.WriteLine($"Expected Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
+                        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
+                        Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
+                        Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+                    }
                     else
                     {
-                        Console.WriteLine("\nCancellation unsuccessful.");
-
-                        if (found.Status == "Out for Delivery")
-                        {
-                            Console.WriteLine(
-                                "The order is already out for delivery."
-                            );
-                            Console.WriteLine(
-                                "Cancellation and refund are no longer available."
-                            );
-                        }
-                        else if (found.Status == "Delivered")
-                        {
-                            Console.WriteLine(
-                                "The order has already been delivered and cannot be cancelled."
-                            );
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Order cannot be cancelled while its status is {found.Status}."
-                            );
-                        }
+                        Console.WriteLine("Delivery information is not available for this order.");
                     }
-                }
-                
-                back = true;
-                break;
-            case "2":
-                Console.WriteLine($"\n=== Track Delivery ORD{found.OrderId} ===");
 
-                Console.WriteLine($"Order Status: {found.Status}");
+                    break;
 
-                if (found.Delivery != null)
-                {
-                    Console.WriteLine($"Delivery Address: {found.Delivery.DeliveryAddress}");
-                    Console.WriteLine($"Expected Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
-                    Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-                    Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-                    Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
-                }
-                else
-                {
-                    Console.WriteLine("Delivery information is not available for this order.");
-                }
+                case "3":
+                    Console.WriteLine("\n=== Process Delivery ===");
 
-                break;
+                    if (found.Status == "Preparing")
+                    {
+                        Console.WriteLine("Packing has been completed.");
 
-            case "3":
-                Console.WriteLine("\n=== Process Delivery ===");
+                        found.PackingCompleted();
 
-                if (found.Status == "Preparing")
-                {
-                    Console.WriteLine("Packing has been completed.");
+                        Console.WriteLine(
+                            $"Order ORD{found.OrderId} is now out for delivery."
+                        );
+                    }
+                    else if (found.Status == "Out for Delivery")
+                    {
+                        Console.WriteLine("Confirming delivery...");
 
-                    found.PackingCompleted();
+                        found.ConfirmDelivery();
 
+                        Console.WriteLine(
+                            $"Order ORD{found.OrderId} has been delivered successfully."
+                        );
+                    }
+                    else if (found.Status == "Delivered")
+                    {
+                        Console.WriteLine(
+                            "This order has already been delivered."
+                        );
+                    }
+                    else if (found.Status == "Cancelled")
+                    {
+                        Console.WriteLine(
+                            "A cancelled order cannot proceed with delivery."
+                        );
+                    }
+                    else
+                    {
+                        Console.WriteLine(
+                            $"Delivery cannot be updated while the order status is {found.Status}."
+                        );
+                    }
+
+                    break;
+
+                case "0":
+                    back = true;
+                    break;
+                default:
                     Console.WriteLine(
-                        $"Order ORD{found.OrderId} is now out for delivery."
+                        "Invalid option. Please enter 0, 1, 2, or 3."
                     );
-                }
-                else if (found.Status == "Out for Delivery")
-                {
-                    Console.WriteLine("Confirming delivery...");
-
-                    found.ConfirmDelivery();
-
-                    Console.WriteLine(
-                        $"Order ORD{found.OrderId} has been delivered successfully."
-                    );
-                }
-                else if (found.Status == "Delivered")
-                {
-                    Console.WriteLine(
-                        "This order has already been delivered."
-                    );
-                }
-                else if (found.Status == "Cancelled")
-                {
-                    Console.WriteLine(
-                        "A cancelled order cannot proceed with delivery."
-                    );
-                }
-                else
-                {
-                    Console.WriteLine(
-                        $"Delivery cannot be updated while the order status is {found.Status}."
-                    );
-                }
-
-                break;
-
-            case "0":
-                back = true;
-                break;
-            default:
-                Console.WriteLine(
-                    "Invalid option. Please enter 0, 1, 2, or 3."
-                );
-                break;
+                    break;
+            }
         }
     }
-}
-void ManageBrandSubscriptions()
-{
-    string observerChoice;
-
-    do
+    void ManageBrandSubscriptions()
     {
-     
-        Console.WriteLine("================================");
-        Console.WriteLine("      BRAND SUBSCRIPTIONS");
-        Console.WriteLine("================================");
-        Console.WriteLine("1. View Available Brands");
-        Console.WriteLine("2. Subscribe to Brand");
-        Console.WriteLine("3. Unsubscribe from Brand");
-        Console.WriteLine("4. View My Subscriptions");
-        Console.WriteLine("5. View Notifications");
-        Console.WriteLine("6. Publish Promotion");
-        Console.WriteLine("0. Back");
-        Console.Write("Enter option: ");
+        string observerChoice;
 
-        observerChoice = Console.ReadLine() ?? "";
-        Console.WriteLine();
-
-        switch (observerChoice)
+        do
         {
-            case "1":
-                Console.WriteLine("Available Brands:");
-                Console.WriteLine();
 
-                foreach (Brand brand in brands)
-                {
-                    Console.WriteLine(
-                        $"{brand.BrandId}. {brand.BrandName}"
-                    );
-                }
-                break;
+            Console.WriteLine("================================");
+            Console.WriteLine("      BRAND SUBSCRIPTIONS");
+            Console.WriteLine("================================");
+            Console.WriteLine("1. View Available Brands");
+            Console.WriteLine("2. Subscribe to Brand");
+            Console.WriteLine("3. Unsubscribe from Brand");
+            Console.WriteLine("4. View My Subscriptions");
+            Console.WriteLine("5. View Notifications");
+            Console.WriteLine("6. Publish Promotion");
+            Console.WriteLine("0. Back");
+            Console.Write("Enter option: ");
 
-            case "2":
-                Console.WriteLine("=== Subscribe to Brand ===");
-                Console.WriteLine();
+            observerChoice = Console.ReadLine() ?? "";
+            Console.WriteLine();
 
-                foreach (Brand brand in brands)
-                {
-                    Console.WriteLine(
-                        $"{brand.BrandId}. {brand.BrandName}"
-                    );
-                }
+            switch (observerChoice)
+            {
+                case "1":
+                    Console.WriteLine("Available Brands:");
+                    Console.WriteLine();
 
-                Console.WriteLine();
-                Console.Write("Enter Brand ID: ");
-
-                int subscribeBrandId;
-
-                while (!int.TryParse(
-                           Console.ReadLine(),
-                           out subscribeBrandId) ||
-                       subscribeBrandId < 1 ||
-                       subscribeBrandId > brands.Count)
-                {
-                    Console.Write(
-                        "Invalid Brand ID. Please try again: "
-                    );
-                }
-
-                Brand brandToSubscribe =
-                    brands[subscribeBrandId - 1];
-
-                customer.SubscribeToBrand(
-                    brandToSubscribe
-                );
-
-                break;
-
-            case "3":
-                Console.WriteLine("=== Unsubscribe from Brand ===");
-                Console.WriteLine();
-
-                foreach (Brand brand in brands)
-                {
-                    Console.WriteLine(
-                        $"{brand.BrandId}. {brand.BrandName}"
-                    );
-                }
-
-                Console.WriteLine();
-                Console.Write("Enter Brand ID: ");
-
-                int unsubscribeBrandId;
-
-                while (!int.TryParse(
-                           Console.ReadLine(),
-                           out unsubscribeBrandId) ||
-                       unsubscribeBrandId < 1 ||
-                       unsubscribeBrandId > brands.Count)
-                {
-                    Console.Write(
-                        "Invalid Brand ID. Please try again: "
-                    );
-                }
-
-                Brand brandToUnsubscribe =
-                    brands[unsubscribeBrandId - 1];
-
-                customer.UnsubscribeFromBrand(
-                    brandToUnsubscribe
-                );
-
-                break;
-
-            case "4":
-                customer.ViewSubscriptions();
-                break;
-
-            case "5":
-                customer.ViewNotifications();
-                break;
-
-            case "6":
-                Console.WriteLine("=== Publish Promotion ===");
-                Console.WriteLine();
-
-                foreach (Brand brand in brands)
-                {
-                    Console.WriteLine(
-                        $"{brand.BrandId}. {brand.BrandName}"
-                    );
-                }
-
-                Console.WriteLine();
-                Console.Write("Enter Brand ID: ");
-
-                int promotionBrandId;
-
-                while (!int.TryParse(
-                           Console.ReadLine(),
-                           out promotionBrandId) ||
-                       promotionBrandId < 1 ||
-                       promotionBrandId > brands.Count)
-                {
-                    Console.Write(
-                        "Invalid Brand ID. Please try again: "
-                    );
-                }
-
-                Brand promotionBrand =
-                    brands[promotionBrandId - 1];
-
-                string promotionTitle;
-
-                while (true)
-                {
-                    Console.Write("Enter Promotion Title: ");
-                    promotionTitle = (Console.ReadLine() ?? "").Trim();
-
-                    if (!string.IsNullOrWhiteSpace(promotionTitle))
+                    foreach (Brand brand in brands)
                     {
-                        break;
+                        Console.WriteLine(
+                            $"{brand.BrandId}. {brand.BrandName}"
+                        );
+                    }
+                    break;
+
+                case "2":
+                    Console.WriteLine("=== Subscribe to Brand ===");
+                    Console.WriteLine();
+
+                    foreach (Brand brand in brands)
+                    {
+                        Console.WriteLine(
+                            $"{brand.BrandId}. {brand.BrandName}"
+                        );
                     }
 
-                    Console.WriteLine("Promotion title cannot be empty.");
-                }
+                    Console.WriteLine();
+                    Console.Write("Enter Brand ID: ");
 
-                string promotionDescription;
+                    int subscribeBrandId;
 
-                while (true)
-                {
-                    Console.Write("Enter Promotion Description: ");
-                    promotionDescription = (Console.ReadLine() ?? "").Trim();
-
-                    if (!string.IsNullOrWhiteSpace(promotionDescription))
+                    while (!int.TryParse(
+                               Console.ReadLine(),
+                               out subscribeBrandId) ||
+                           subscribeBrandId < 1 ||
+                           subscribeBrandId > brands.Count)
                     {
-                        break;
+                        Console.Write(
+                            "Invalid Brand ID. Please try again: "
+                        );
                     }
 
-                    Console.WriteLine("Promotion description cannot be empty.");
-                }
+                    Brand brandToSubscribe =
+                        brands[subscribeBrandId - 1];
 
-                Console.Write("Enter Discount Percentage: ");
-
-                decimal discountPercentage;
-
-                while (!decimal.TryParse(
-                           Console.ReadLine(),
-                           out discountPercentage) ||
-                       discountPercentage <= 0 ||
-                       discountPercentage > 100)
-                {
-                    Console.Write(
-                        "Invalid discount. Enter a value between 1 and 100: "
+                    customer.SubscribeToBrand(
+                        brandToSubscribe
                     );
-                }
 
-                Promotion newPromotion = new Promotion(
-                    nextPromotionId,
-                    promotionTitle,
-                    promotionDescription,
-                    discountPercentage,
-                    DateTime.Now,
-                    DateTime.Now.AddDays(7)
-                );
+                    break;
 
-                promotionBrand.AddPromotion(newPromotion);
-                nextPromotionId++;
+                case "3":
+                    Console.WriteLine("=== Unsubscribe from Brand ===");
+                    Console.WriteLine();
 
-                break;
+                    foreach (Brand brand in brands)
+                    {
+                        Console.WriteLine(
+                            $"{brand.BrandId}. {brand.BrandName}"
+                        );
+                    }
 
-            case "0":
-                break;
+                    Console.WriteLine();
+                    Console.Write("Enter Brand ID: ");
 
-            default:
-                Console.WriteLine(
-                    "Invalid option. Please try again."
-                );
-                break;
-        }
+                    int unsubscribeBrandId;
 
-    } while (observerChoice != "0");
-}
+                    while (!int.TryParse(
+                               Console.ReadLine(),
+                               out unsubscribeBrandId) ||
+                           unsubscribeBrandId < 1 ||
+                           unsubscribeBrandId > brands.Count)
+                    {
+                        Console.Write(
+                            "Invalid Brand ID. Please try again: "
+                        );
+                    }
+
+                    Brand brandToUnsubscribe =
+                        brands[unsubscribeBrandId - 1];
+
+                    customer.UnsubscribeFromBrand(
+                        brandToUnsubscribe
+                    );
+
+                    break;
+
+                case "4":
+                    customer.ViewSubscriptions();
+                    break;
+
+                case "5":
+                    customer.ViewNotifications();
+                    break;
+
+                case "6":
+                    Console.WriteLine("=== Publish Promotion ===");
+                    Console.WriteLine();
+
+                    foreach (Brand brand in brands)
+                    {
+                        Console.WriteLine(
+                            $"{brand.BrandId}. {brand.BrandName}"
+                        );
+                    }
+
+                    Console.WriteLine();
+                    Console.Write("Enter Brand ID: ");
+
+                    int promotionBrandId;
+
+                    while (!int.TryParse(
+                               Console.ReadLine(),
+                               out promotionBrandId) ||
+                           promotionBrandId < 1 ||
+                           promotionBrandId > brands.Count)
+                    {
+                        Console.Write(
+                            "Invalid Brand ID. Please try again: "
+                        );
+                    }
+
+                    Brand promotionBrand =
+                        brands[promotionBrandId - 1];
+
+                    string promotionTitle;
+
+                    while (true)
+                    {
+                        Console.Write("Enter Promotion Title: ");
+                        promotionTitle = (Console.ReadLine() ?? "").Trim();
+
+                        if (!string.IsNullOrWhiteSpace(promotionTitle))
+                        {
+                            break;
+                        }
+
+                        Console.WriteLine("Promotion title cannot be empty.");
+                    }
+
+                    string promotionDescription;
+
+                    while (true)
+                    {
+                        Console.Write("Enter Promotion Description: ");
+                        promotionDescription = (Console.ReadLine() ?? "").Trim();
+
+                        if (!string.IsNullOrWhiteSpace(promotionDescription))
+                        {
+                            break;
+                        }
+
+                        Console.WriteLine("Promotion description cannot be empty.");
+                    }
+
+                    Console.Write("Enter Discount Percentage: ");
+
+                    decimal discountPercentage;
+
+                    while (!decimal.TryParse(
+                               Console.ReadLine(),
+                               out discountPercentage) ||
+                           discountPercentage <= 0 ||
+                           discountPercentage > 100)
+                    {
+                        Console.Write(
+                            "Invalid discount. Enter a value between 1 and 100: "
+                        );
+                    }
+
+                    Promotion newPromotion = new Promotion(
+                        nextPromotionId,
+                        promotionTitle,
+                        promotionDescription,
+                        discountPercentage,
+                        DateTime.Now,
+                        DateTime.Now.AddDays(7)
+                    );
+
+                    promotionBrand.AddPromotion(newPromotion);
+                    nextPromotionId++;
+
+                    break;
+
+                case "0":
+                    break;
+
+                default:
+                    Console.WriteLine(
+                        "Invalid option. Please try again."
+                    );
+                    break;
+            }
+
+        } while (observerChoice != "0");
+    }
