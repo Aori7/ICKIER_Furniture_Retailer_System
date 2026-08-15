@@ -712,7 +712,6 @@ void Checkout()
     //$"TRK{newOrder.OrderId}"
     //);
 
-    newOrder.SetDelivery(delivery);
     foreach (var (item, qty) in cart)
     {
         newOrder.addItem(
@@ -854,6 +853,7 @@ void ViewOrderDetails()
     {
         Console.WriteLine();
         Console.WriteLine("Delivery Details:");
+        Console.WriteLine($"Delivery Type: {found.Delivery.GetType().Name}");
         Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
         Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
         Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
@@ -1064,8 +1064,9 @@ void ManageOrder()
                     Console.WriteLine($"Delivery Address: {found.Delivery.DeliveryAddress}");
                     Console.WriteLine($"Expected Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
                     Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-                    Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-                    Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+                    //Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
+                    //Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
+                    Console.WriteLine(found.Delivery.TrackDelivery());
                 }
                 else
                 {
