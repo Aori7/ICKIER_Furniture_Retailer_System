@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 //ada
 namespace ICKIER_Furniture_Retailer_System
 {
-    internal class SteelChair : Chair
+    public class SteelChair : Chair
     {
-        public SteelChair() : base(103, "Steel Chair", 80m, "A comfortable steel chair.", "Steel", 90)
+        public SteelChair(int furnitureId, string name, decimal basePrice, string description, double height) : base(furnitureId, name, basePrice, description, "Steel", height)
         {
         }
     }
