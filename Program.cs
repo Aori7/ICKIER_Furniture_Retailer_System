@@ -450,6 +450,25 @@ void SearchFurniture()
         }
 
         List<FurnitureItem> allItems = new List<FurnitureItem>();
+        List<FurnitureItem> GetAllFurnitureItems(FurnitureCollection collection)
+        {
+            List<FurnitureItem> items = new List<FurnitureItem>();
+
+            foreach (CatalogComponent child in collection.Children)
+            {
+                if (child is FurnitureItem)
+                {
+                    items.Add((FurnitureItem)child);
+                }
+                else if (child is FurnitureCollection)
+                {
+                    FurnitureCollection subCollection = (FurnitureCollection)child;
+                    items.AddRange(GetAllFurnitureItems(subCollection));
+                }
+            }
+
+            return items;
+        }
 
         foreach (FurnitureCollection collection in Catalogue)
         {
