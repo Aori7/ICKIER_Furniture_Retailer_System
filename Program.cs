@@ -6,8 +6,6 @@
 using ICKIER_Furniture_Retailer_System;
 using System.Collections;
 
-List<FurnitureItem> catalogue = new List<FurnitureItem>();
-
 // furniture collections; composite pattern
 FurnitureCollection bedroom = new FurnitureCollection(1, "Bedroom Collection", "Bedroom items");
 FurnitureCollection livingRoom = new FurnitureCollection(2, "Living Room Collection", "Living Room items");
@@ -56,6 +54,7 @@ office.Add(subOffice);
 
 kitchen.Add(sink1);
 subKitchen.Add(stove1);
+kitchen.Add(subKitchen);
 
 bathroom.Add(showerHead1);
 bathroom.Add(sink1);
