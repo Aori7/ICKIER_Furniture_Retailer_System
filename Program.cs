@@ -15,6 +15,11 @@ FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Of
 FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
 FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
 
+FurnitureCollection subBedroom = new FurnitureCollection(6,"SubBedroom Collection", "Bedroom Sub-Collection");
+FurnitureCollection subLivingRoom = new FurnitureCollection(7, "SubLivingRoom Collection", "Living Room Sub-Collection");
+FurnitureCollection subOffice = new FurnitureCollection(8, "SubOffice Collection", "Office Sub-Collection");
+FurnitureCollection subKitchen = new FurnitureCollection(9, "SubKitchen Collection", "Kitchen Sub-Collection");
+
 // create material factories; asbtract factory pattern
 FurnitureFactory oakFactory = new OakFurnitureFactory();
 FurnitureFactory pineFactory = new PineFurnitureFactory();
@@ -35,19 +40,22 @@ FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= So
 // adding items into collection
 bedroom.Add(bed1);
 bedroom.Add(bookshelf1);
-bedroom.Add(door1);
+subBedroom.Add(door1);
+bedroom.Add(subBedroom);
 
 livingRoom.Add(table1);
 livingRoom.Add(sofa1);
-livingRoom.Add(chair1);
+subLivingRoom.Add(chair1);
+livingRoom.Add(subLivingRoom);
 
 office.Add(table1);
 office.Add(chair1);
 office.Add(bookshelf1);
-office.Add(door1);
+subOffice.Add(door1);
+office.Add(subOffice);
 
 kitchen.Add(sink1);
-kitchen.Add(stove1);
+subKitchen.Add(stove1);
 
 bathroom.Add(showerHead1);
 bathroom.Add(sink1);
@@ -59,6 +67,9 @@ List<FurnitureCollection> Catalogue = new List<FurnitureCollection>
 {
 bedroom, livingRoom, office, kitchen, bathroom
 };
+
+// order facade
+OrderFacade orderFacade = new OrderFacade();
 
 // Sample data setup
 List<Order> orderHistory = new List<Order>();
@@ -152,82 +163,147 @@ switch (choice)
 // display and select add ons
 void BrowseFurniture()
 {
-bool back = false;
-while (!back)
-{
-    Console.WriteLine();
-    Console.WriteLine("=== Browse Furniture ===");
-    Console.WriteLine("Select Furniture Collection:");
-    for (int i = 0; i < Catalogue.Count; i++)
-    {
-        Console.WriteLine($"{i + 1}. {Catalogue[i].Name}");
-    }
-    Console.WriteLine("0. Back");
-    Console.Write("Enter your choice: ");
+    bool back = false;
 
-    string input = Console.ReadLine();
-
-    if (input == "0")
+    while (!back)
     {
-        return;
-    }
-    else if (!int.TryParse(input, out int choice))
-    {
-        Console.WriteLine("Please enter a valid number.");
-        continue;
-    }
-    else if (choice < 1 || choice > Catalogue.Count)
-    {
-        Console.WriteLine("Invalid collection.");
-        continue;
-    }
-    else // composite pattern
-    {
-        FurnitureCollection collection = Catalogue[choice - 1];
-
         Console.WriteLine();
-        Console.WriteLine($"=== {collection.Name} ===");
-        int i = 0;
-        foreach (FurnitureItem fi in collection.Children)
+        Console.WriteLine("=== Browse Furniture ===");
+        Console.WriteLine("Select Furniture Collection:");
+
+        for (int i = 0; i < Catalogue.Count; i++)
         {
-            i += 1;
-            Console.WriteLine($"{i}. {fi.Name}");
+            Console.WriteLine($"{i + 1}. {Catalogue[i].Name}");
         }
+
         Console.WriteLine("0. Back");
         Console.Write("Enter your choice: ");
-        string itemIndex = Console.ReadLine();
 
-        if (itemIndex == "0")
+        string input = Console.ReadLine() ?? "";
+
+        if (input == "0")
         {
-            continue;
+            return;
         }
-        else if (!int.TryParse(itemIndex, out int choice2))
+        else if (!int.TryParse(input, out int choice))
         {
             Console.WriteLine("Please enter a valid number.");
             continue;
         }
-        else if (choice2 < 1 || choice2 > collection.Children.Count)
+        else if (choice < 1 || choice > Catalogue.Count)
         {
-            Console.WriteLine("Invalid furniture item.");
+            Console.WriteLine("Invalid collection.");
             continue;
         }
-        else
+
+        FurnitureCollection collection = Catalogue[choice - 1];
+        bool backToCollections = false;
+
+        while (!backToCollections)
         {
-            FurnitureItem item = (FurnitureItem)collection.Children[choice2 - 1];
+            Console.WriteLine();
+            Console.WriteLine($"=== {collection.Name} ===");
+
+            for (int i = 0; i < collection.Children.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {collection.Children[i].Name}");
+            }
+
+            Console.WriteLine("0. Back");
+            Console.Write("Enter your choice: ");
+
+            string itemIndex = Console.ReadLine() ?? "";
+
+            if (itemIndex == "0")
+            {
+                backToCollections = true;
+                continue;
+            }
+            else if (!int.TryParse(itemIndex, out int choice2))
+            {
+                Console.WriteLine("Please enter a valid number.");
+                continue;
+            }
+            else if (choice2 < 1 || choice2 > collection.Children.Count)
+            {
+                Console.WriteLine("Invalid choice.");
+                continue;
+            }
+
+            CatalogComponent selectedChild = collection.Children[choice2 - 1];
+            FurnitureItem item;
+
+            // composite Pattern - subcollection
+            if (selectedChild is FurnitureCollection)
+            {
+                FurnitureCollection subCollection = (FurnitureCollection)selectedChild;
+
+                Console.WriteLine();
+                Console.WriteLine($"=== {subCollection.Name} ===");
+
+                for (int i = 0; i < subCollection.Children.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {subCollection.Children[i].Name}");
+                }
+
+                Console.WriteLine("0. Back");
+                Console.Write("Enter your choice: ");
+
+                string subInput = Console.ReadLine() ?? "";
+
+                if (subInput == "0")
+                {
+                    continue;
+                }
+                else if (!int.TryParse(subInput, out int subChoice))
+                {
+                    Console.WriteLine("Please enter a valid number.");
+                    continue;
+                }
+                else if (subChoice < 1 || subChoice > subCollection.Children.Count)
+                {
+                    Console.WriteLine("Invalid choice.");
+                    continue;
+                }
+
+                CatalogComponent subSelected = subCollection.Children[subChoice - 1];
+
+                if (subSelected is FurnitureItem)
+                {
+                    item = (FurnitureItem)subSelected;
+                }
+                else
+                {
+                    Console.WriteLine("Please select a furniture item.");
+                    continue;
+                }
+            }
+            // composite Pattern - item
+            else if (selectedChild is FurnitureItem)
+            {
+                item = (FurnitureItem)selectedChild;
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection.");
+                continue;
+            }
             FurnitureItem selected = item;
 
-            //customisable furnitures; abstract factory pattern
+            // Abstract Factory Pattern - customisable furniture
             if (item.Name == "Table" || item.Name == "Chair" || item.Name == "Bookshelf")
             {
-                Console.WriteLine("\nCustomise Furniture");
+                Console.WriteLine();
+                Console.WriteLine("=== Customise Furniture ===");
                 Console.WriteLine("Choose Furniture Material:");
-                Console.WriteLine("1.Oak");
-                Console.WriteLine("2.Pine");
-                Console.WriteLine("3.Steel");
-                Console.WriteLine("Enter Choice:");
-                string materialChoice = Console.ReadLine() ?? "";
+                Console.WriteLine("1. Oak");
+                Console.WriteLine("2. Pine");
+                Console.WriteLine("3. Steel");
+                Console.Write("Enter choice: ");
 
+                string materialChoice = Console.ReadLine() ?? "";
                 FurnitureFactory fact;
+
                 if (materialChoice == "1")
                 {
                     fact = oakFactory;
@@ -236,7 +312,7 @@ while (!back)
                 {
                     fact = pineFactory;
                 }
-                else if (materialChoice == "3") 
+                else if (materialChoice == "3")
                 {
                     fact = steelFactory;
                 }
@@ -246,28 +322,31 @@ while (!back)
                     continue;
                 }
 
-                //handle dimensions
-                if (item.Name == "Table") //input length,width
+                if (item.Name == "Table")
                 {
                     Console.Write("Enter length (cm): ");
                     double length = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter width (cm): ");
                     double width = Convert.ToDouble(Console.ReadLine());
 
                     selected = fact.CreateTable(length, width);
                 }
-                else if (item.Name == "Chair") //height
+                else if (item.Name == "Chair")
                 {
                     Console.Write("Enter height (cm): ");
                     double height = Convert.ToDouble(Console.ReadLine());
+
                     selected = fact.CreateChair(height);
                 }
-                else if (item.Name == "Bookshelf") //height width shelfcount
+                else if (item.Name == "Bookshelf")
                 {
                     Console.Write("Enter height (cm): ");
                     double height = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter width (cm): ");
                     double width = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter number of shelves: ");
                     int shelfCount = Convert.ToInt32(Console.ReadLine());
 
@@ -278,22 +357,23 @@ while (!back)
             while (true)
             {
                 Console.WriteLine();
-                Console.WriteLine($"=== {selected.Name} ==="); //print out the customised furniture details
+                Console.WriteLine($"=== {selected.Name} ===");
                 Console.WriteLine($"Price: ${selected.GetPrice():F2}");
                 Console.WriteLine($"Description: {selected.Description}");
-                Console.Write($"Add item to cart? Y/N: ");
-                string decision = Console.ReadLine();
+                Console.Write("Add item to cart? Y/N: ");
+                string decision = (Console.ReadLine() ?? "").ToUpper();
 
-                if (decision.ToUpper() == "N")
+                if (decision == "N")
                 {
-                    break; // goes back to displaying items of selected collection
+                    break;
                 }
-                else if (decision.ToUpper() == "Y")
+                else if (decision == "Y")
                 {
-                    //decorator pattern
+                    // Decorator Pattern
                     while (true)
                     {
-                        Console.WriteLine("\nAdd-ons:");
+                        Console.WriteLine();
+                        Console.WriteLine("=== Add-ons ===");
                         Console.WriteLine("1. Add Warranty (+$49.99)");
                         Console.WriteLine("2. Add Installation (+$79.99)");
                         Console.WriteLine("3. Add Both");
@@ -327,7 +407,6 @@ while (!back)
                     }
 
                     int qty;
-
                     while (true)
                     {
                         Console.Write("Enter quantity: ");
@@ -336,22 +415,20 @@ while (!back)
                         {
                             break;
                         }
-
                         Console.WriteLine("Invalid quantity. Please enter a whole number greater than 0.");
                     }
 
                     cart.Add((selected, qty));
-                    Console.WriteLine($"\n{selected.Name} x{qty} added to cart!");
-                    break;
+                    Console.WriteLine($"{selected.Name} x{qty} added to cart!");
+                    return;
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input");
+                    Console.WriteLine("Invalid input. Please enter Y or N.");
                 }
             }
         }
     }
-}
 }
 
 
@@ -364,16 +441,25 @@ void SearchFurniture()
         Console.WriteLine("=== Search Furniture ===");
         Console.WriteLine();
         Console.Write("Which furniture are you looking for? (Enter 0 to go back): ");
+
         string keyword = (Console.ReadLine() ?? "").ToLower();
+
         if (keyword == "0")
         {
             return;
         }
 
-        var results = catalogue.Where(f =>
-        f.Name.ToLower().Contains(keyword) ||
-        f.GetDescription().ToLower().Contains(keyword)).ToList();
+        List<FurnitureItem> allItems = new List<FurnitureItem>();
 
+        foreach (FurnitureCollection collection in Catalogue)
+        {
+            allItems.AddRange(GetAllFurnitureItems(collection));
+        }
+
+        var results = allItems.Where(f =>
+            f.Name.ToLower().Contains(keyword) ||
+            f.GetDescription().ToLower().Contains(keyword)
+        ).ToList();
 
         if (results.Count == 0)
         {
@@ -382,6 +468,7 @@ void SearchFurniture()
         else
         {
             Console.WriteLine($"=== Search Results for \"{keyword}\" ===\n");
+
             for (int i = 0; i < results.Count; i++)
             {
                 Console.WriteLine($"{i + 1}. {results[i].Name}");
@@ -391,6 +478,7 @@ void SearchFurniture()
             }
 
             Console.Write("Enter item number to add to cart (or 0 to search again): ");
+
             string itemChoice = Console.ReadLine() ?? "";
 
             if (itemChoice == "0")
@@ -407,6 +495,8 @@ void SearchFurniture()
                 Console.WriteLine(
                     $"\n{results[itemIdx - 1].Name} x1 added to cart!"
                 );
+
+                return;
             }
             else
             {
@@ -416,7 +506,6 @@ void SearchFurniture()
             }
         }
     }
-
 }
 
 // ─── Option 3: View Cart ──────────────────────────────────────────────
@@ -562,13 +651,11 @@ void Checkout()
             Console.WriteLine();
             continue;
         }
-
         break;
     }
 
     // Delivery date
     DateTime deliveryDate;
-
     while (true)
     {
         Console.Write("Select Preferred Delivery Date (dd/MM/yyyy): ");
@@ -584,27 +671,22 @@ void Checkout()
 
         if (!validDate)
         {
-            Console.WriteLine(
-                "Invalid date format. Please enter the date as dd/MM/yyyy."
-            );
+            Console.WriteLine("Invalid date format. Please enter the date as dd/MM/yyyy.");
             continue;
         }
 
         if (deliveryDate.Date <= DateTime.Today)
         {
-            Console.WriteLine(
-                "Delivery date must be a future date."
-            );
+            Console.WriteLine("Delivery date must be a future date.");
             continue;
         }
 
         break;
     }
 
-    //Console.WriteLine("\nConnecting to external delivery provider...");
     Console.WriteLine($"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM");
 
-    //factory pattern
+    // Factory Pattern - Delivery
     Console.WriteLine("\nSelect Delivery Type:");
     Console.WriteLine("1. Standard Delivery");
     Console.WriteLine("2. Express Delivery");
@@ -638,11 +720,9 @@ void Checkout()
     // Strategy Pattern - Payment
     Payment payment = new Payment(orderCounter, total);
 
-    Console.WriteLine();
+    bool paymentSelected = false;
 
-    bool paymentSuccessful = false;
-
-    while (!paymentSuccessful)
+    while (!paymentSelected)
     {
         Console.WriteLine("\nSelect Payment Method:");
         Console.WriteLine("1. Credit Card");
@@ -662,6 +742,8 @@ void Checkout()
                 payment.SetPaymentStrategy(
                     new CreditCardPayment(cardNumber)
                 );
+
+                paymentSelected = true;
                 break;
 
             case "2":
@@ -671,12 +753,16 @@ void Checkout()
                 payment.SetPaymentStrategy(
                     new PayPalPayment(email)
                 );
+
+                paymentSelected = true;
                 break;
 
             case "3":
                 payment.SetPaymentStrategy(
                     new CashOnDeliveryPayment()
                 );
+
+                paymentSelected = true;
                 break;
 
             case "0":
@@ -684,33 +770,13 @@ void Checkout()
                 return;
 
             default:
-                Console.WriteLine(
-                    "Invalid payment method. Please try again."
-                );
-                continue;
-        }
-
-        Console.WriteLine();
-
-        paymentSuccessful = payment.ProcessPayment();
-
-        if (!paymentSuccessful)
-        {
-            Console.WriteLine();
-            Console.WriteLine(
-                "Please select a payment method and try again."
-            );
+                Console.WriteLine("Invalid payment method. Please try again.");
+                break;
         }
     }
 
-    // Create order
+    // Create Order
     Order newOrder = new Order(orderCounter++);
-    newOrder.SetPayment(payment);
-
-    Delivery delivery = deliveryCreator.CreateDelivery(newOrder.OrderId, address, deliveryDate, $"TRK{newOrder.OrderId}");
-
-    delivery.ScheduleDelivery();
-    newOrder.SetDelivery(delivery);
 
     foreach (var (item, qty) in cart)
     {
@@ -723,9 +789,19 @@ void Checkout()
         );
     }
 
-    newOrder.PlaceOrder();
-    newOrder.MakePayment();
+    // Factory Pattern - Create Delivery
+    Delivery delivery = deliveryCreator.CreateDelivery(newOrder.OrderId, address, deliveryDate, $"TRK{newOrder.OrderId}" );
 
+    // Facade Pattern
+    bool orderPlaced = orderFacade.PlaceOrder(newOrder, payment, delivery);
+
+    if (!orderPlaced)
+    {
+        Console.WriteLine("Checkout was unsuccessful.");
+        return;
+    }
+
+    // Save order
     orderHistory.Insert(0, newOrder);
     lastOrder = newOrder;
 
@@ -737,7 +813,6 @@ void Checkout()
     Console.WriteLine($"Order ID: ORD{newOrder.OrderId}");
     Console.WriteLine($"Total Amount: ${total:N2}");
     Console.WriteLine($"Order Status: {newOrder.Status}");
-
     Console.WriteLine($"Payment Method: {payment.PaymentMethod}");
 
     if (payment.IsCashOnDelivery)
@@ -758,12 +833,14 @@ void Checkout()
 
     Console.WriteLine("================================");
 
-    //save current order
+    // Save current order items for Repeat Order
     lastOrderItems.Clear();
+
     foreach (var item in cart)
     {
         lastOrderItems.Add(item);
     }
+
     cart.Clear();
 }
 
@@ -834,15 +911,11 @@ void ViewOrderDetails()
 
     if (!int.TryParse(input, out int orderId))
     {
-        Console.WriteLine(
-            "Invalid Order ID. Please use a format such as ORD1001."
-        );
+        Console.WriteLine("Invalid Order ID. Please use a format such as ORD1001.");
         return;
     }
 
-    Order? found = orderHistory.FirstOrDefault(
-        o => o.OrderId == orderId
-    );
+    Order? found = orderHistory.FirstOrDefault(o => o.OrderId == orderId);
 
     if (found == null)
     {
@@ -850,49 +923,9 @@ void ViewOrderDetails()
         return;
     }
 
-    Console.WriteLine();
-    Console.WriteLine("=== Order Details ===");
-    Console.WriteLine($"Order ID: ORD{found.OrderId}");
-    Console.WriteLine($"Status:   {found.Status}");
-    Console.WriteLine($"Total:    ${found.TotalAmount:N2}");
-    if (found.Delivery != null)
-    {
-        Console.WriteLine();
-        Console.WriteLine("Delivery Details:");
-        Console.WriteLine($"Delivery Type: {found.Delivery.GetType().Name}");
-        Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
-        Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
-        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-        Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-        Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
-    }
+    // Facade Pattern
+    orderFacade.DisplayOrderDetails(found);
 
-
-    if (found.Payment != null)
-    {
-        Console.WriteLine($"Payment Method: {found.Payment.PaymentMethod}");
-        if (found.Payment.IsCashOnDelivery)
-        {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Cash on Delivery - Paid"
-                    : "Payment status: Cash on Delivery - Pending Collection"
-            );
-        }
-        else
-        {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Paid"
-                    : "Payment status: Not Paid"
-            );
-        }
-
-        if (found.Payment.IsRefunded)
-        {
-            Console.WriteLine("Refund Status: Refunded");
-        }
-    }
     Console.WriteLine();
     Console.WriteLine("What would you like to do?");
     Console.WriteLine("1. Manage This Order");
@@ -906,6 +939,8 @@ void ViewOrderDetails()
         ManageOrder();
     }
 }
+
+
 // ─── Option 6: Repeat Last Order ──────────────────────────────────────
 // command pattern
 void RepeatLastOrder()
@@ -1008,59 +1043,17 @@ void ManageOrder()
                 Console.WriteLine("1. Confirm");
                 Console.WriteLine("0. Back");
                 Console.Write("Enter your choice: ");
+
                 string confirm = Console.ReadLine() ?? "";
 
                 if (confirm == "1")
                 {
-                    found.CancelOrder();
-                    if (found.Status == "Cancelled")
-                    {
-                        Console.WriteLine("\nOrder cancelled successfully.");
-
-                        if (found.Payment != null)
-                        {
-                            if (found.Payment.IsPaid)
-                            {
-                                found.Payment.RefundPayment();
-                            }
-                            else if (found.Payment.IsCashOnDelivery)
-                            {
-                                Console.WriteLine(
-                                    "No refund is required because Cash on Delivery has not been collected."
-                                );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nCancellation unsuccessful.");
-
-                        if (found.Status == "Out for Delivery")
-                        {
-                            Console.WriteLine(
-                                "The order is already out for delivery."
-                            );
-                            Console.WriteLine(
-                                "Cancellation and refund are no longer available."
-                            );
-                        }
-                        else if (found.Status == "Delivered")
-                        {
-                            Console.WriteLine(
-                                "The order has already been delivered and cannot be cancelled."
-                            );
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Order cannot be cancelled while its status is {found.Status}."
-                            );
-                        }
-                    }
+                    // Facade Pattern
+                    orderFacade.CancelOrder(found);
                 }
-
                 back = true;
                 break;
+
             case "2":
                 Console.WriteLine($"\n=== Track Delivery ORD{found.OrderId} ===");
 
