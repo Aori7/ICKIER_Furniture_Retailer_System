@@ -6,8 +6,6 @@
 using ICKIER_Furniture_Retailer_System;
 using System.Collections;
 
-List<FurnitureItem> catalogue = new List<FurnitureItem>();
-
 // furniture collections; composite pattern
 FurnitureCollection bedroom = new FurnitureCollection(1, "Bedroom Collection", "Bedroom items");
 FurnitureCollection livingRoom = new FurnitureCollection(2, "Living Room Collection", "Living Room items");
@@ -56,6 +54,7 @@ office.Add(subOffice);
 
 kitchen.Add(sink1);
 subKitchen.Add(stove1);
+kitchen.Add(subKitchen);
 
 bathroom.Add(showerHead1);
 bathroom.Add(sink1);
@@ -181,11 +180,12 @@ void BrowseFurniture()
 
         string input = Console.ReadLine() ?? "";
 
+        int choice;
         if (input == "0")
         {
             return;
         }
-        else if (!int.TryParse(input, out int choice))
+        else if (!int.TryParse(input, out choice))
         {
             Console.WriteLine("Please enter a valid number.");
             continue;
@@ -214,12 +214,13 @@ void BrowseFurniture()
 
             string itemIndex = Console.ReadLine() ?? "";
 
+            int choice2;
             if (itemIndex == "0")
             {
                 backToCollections = true;
                 continue;
             }
-            else if (!int.TryParse(itemIndex, out int choice2))
+            else if (!int.TryParse(itemIndex, out choice2))
             {
                 Console.WriteLine("Please enter a valid number.");
                 continue;
@@ -251,11 +252,12 @@ void BrowseFurniture()
 
                 string subInput = Console.ReadLine() ?? "";
 
+                int subChoice;
                 if (subInput == "0")
                 {
                     continue;
                 }
-                else if (!int.TryParse(subInput, out int subChoice))
+                else if (!int.TryParse(subInput, out subChoice))
                 {
                     Console.WriteLine("Please enter a valid number.");
                     continue;
@@ -450,6 +452,25 @@ void SearchFurniture()
         }
 
         List<FurnitureItem> allItems = new List<FurnitureItem>();
+        List<FurnitureItem> GetAllFurnitureItems(FurnitureCollection collection)
+        {
+            List<FurnitureItem> items = new List<FurnitureItem>();
+
+            foreach (CatalogComponent child in collection.Children)
+            {
+                if (child is FurnitureItem)
+                {
+                    items.Add((FurnitureItem)child);
+                }
+                else if (child is FurnitureCollection)
+                {
+                    FurnitureCollection subCollection = (FurnitureCollection)child;
+                    items.AddRange(GetAllFurnitureItems(subCollection));
+                }
+            }
+
+            return items;
+        }
 
         foreach (FurnitureCollection collection in Catalogue)
         {
@@ -850,7 +871,7 @@ void ViewOrderHistory()
     bool back = false;
     while (!back)
     {
-
+        Console.WriteLine();
         Console.WriteLine("=== Order History ===\n");
 
         if (orderHistory.Count == 0)
@@ -945,6 +966,7 @@ void ViewOrderDetails()
 // command pattern
 void RepeatLastOrder()
 {
+    Console.WriteLine();
     Console.WriteLine("\n=== Repeat Last Order ===");
 
     if (lastOrder == null || lastOrderItems.Count == 0)
@@ -965,6 +987,7 @@ void RepeatLastOrder()
     {
         orderCommandInvoker.ExecuteCommand();
 
+        Console.WriteLine();
         Console.WriteLine("\nPrevious order has been repeated.");
         Console.WriteLine("1. Proceed to Checkout");
         Console.WriteLine("2. Undo Repeat");
@@ -997,6 +1020,7 @@ void RepeatLastOrder()
 void ManageOrder()
 {
 
+    Console.WriteLine();
     Console.WriteLine("=== Manage Order ===\n");
 
     Console.Write("Enter Order ID (e.g. ORD1001): ");

@@ -17,7 +17,7 @@ namespace ICKIER_Furniture_Retailer_System
         private Promotion? activePromotion;
 
         public int FurnitureId { get { return furnitureId; } set { furnitureId = value; } }
-        public string Name { get { return name; } set { name = value; } }
+        public override string Name { get { return name; } }
         public decimal BasePrice { get { return basePrice; } set { basePrice = value; } }
         public string Description { get { return description; } set { description = value; } }
 

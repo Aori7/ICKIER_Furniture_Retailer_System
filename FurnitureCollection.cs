@@ -13,7 +13,7 @@ namespace ICKIER_Furniture_Retailer_System
         private List<CatalogComponent> children;
 
         public int CollectionId {  get { return collectionId; } set { collectionId = value; } }
-        public string Name { get { return name; } set { name = value; } }
+        public override string Name { get { return name; } }
         public string Description { get { return description; } set { description = value; } }
         public List<CatalogComponent> Children { get { return children; } set { children = value; } }
 
