@@ -16,11 +16,8 @@ namespace ICKIER_Furniture_Retailer_System
                 return false;
             }
 
-            // Link Payment and Delivery to the Order
             order.SetPayment(payment);
             order.SetDelivery(delivery);
-
-            // Process payment
             bool paymentSuccessful = payment.ProcessPayment();
 
             if (!paymentSuccessful)
@@ -29,7 +26,7 @@ namespace ICKIER_Furniture_Retailer_System
                 return false;
             }
 
-            // Use existing Order methods
+            delivery.ScheduleDelivery();
             order.PlaceOrder();
             order.MakePayment();
             Console.WriteLine($"Order ORD{order.OrderId} placed successfully.");
@@ -46,18 +43,15 @@ namespace ICKIER_Furniture_Retailer_System
                 return false;
             }
 
-            // Existing Order method
             order.CancelOrder();
 
-            // Your State pattern determines whether cancellation succeeds
             if (order.Status != "Cancelled")
             {
                 Console.WriteLine($"Order ORD{order.OrderId} could not be cancelled.");
-
                 return false;
             }
 
-            // Refund if required
+            // refund
             if (order.Payment != null)
             {
                 if (order.Payment.IsPaid)
@@ -66,34 +60,14 @@ namespace ICKIER_Furniture_Retailer_System
                 }
                 else if (order.Payment.IsCashOnDelivery)
                 {
-                    Console.WriteLine("No refund is required because Cash on Delivery has not been collected.");
+                    Console.WriteLine(
+                        "No refund is required because Cash on Delivery has not been collected."
+                    );
                 }
-            }
-
-            // Update delivery if the order already has one
-            if (order.Delivery != null)
-            {
-                order.Delivery.UpdateStatus("Cancelled");
             }
 
             Console.WriteLine($"Order ORD{order.OrderId} cancelled successfully.");
             return true;
-        }
-
-
-        // Gets delivery tracking information through the Facade
-        public string TrackOrder(Order order)
-        {
-            if (order == null)
-            {
-                return "Order cannot be found.";
-            }
-
-            if (order.Delivery == null)
-            {
-                return "Delivery information is not available.";
-            }
-            return order.Delivery.TrackDelivery();
         }
 
 
@@ -112,7 +86,7 @@ namespace ICKIER_Furniture_Retailer_System
             Console.WriteLine($"Status: {order.Status}");
             Console.WriteLine($"Total: ${order.TotalAmount:N2}");
 
-            // Payment information
+            // payment information
             if (order.Payment != null)
             {
                 Console.WriteLine();
@@ -147,7 +121,7 @@ namespace ICKIER_Furniture_Retailer_System
                 }
             }
 
-            // Delivery information
+            // delivery information
             if (order.Delivery != null)
             {
                 Console.WriteLine();

@@ -60,6 +60,9 @@ List<FurnitureCollection> Catalogue = new List<FurnitureCollection>
 bedroom, livingRoom, office, kitchen, bathroom
 };
 
+// order facade
+OrderFacade orderFacade = new OrderFacade();
+
 // Sample data setup
 List<Order> orderHistory = new List<Order>();
 Order? lastOrder = null;
@@ -342,7 +345,7 @@ while (!back)
 
                     cart.Add((selected, qty));
                     Console.WriteLine($"\n{selected.Name} x{qty} added to cart!");
-                    break;
+                    return;
                 }
                 else
                 {
@@ -562,13 +565,11 @@ void Checkout()
             Console.WriteLine();
             continue;
         }
-
         break;
     }
 
     // Delivery date
     DateTime deliveryDate;
-
     while (true)
     {
         Console.Write("Select Preferred Delivery Date (dd/MM/yyyy): ");
@@ -584,27 +585,22 @@ void Checkout()
 
         if (!validDate)
         {
-            Console.WriteLine(
-                "Invalid date format. Please enter the date as dd/MM/yyyy."
-            );
+            Console.WriteLine("Invalid date format. Please enter the date as dd/MM/yyyy.");
             continue;
         }
 
         if (deliveryDate.Date <= DateTime.Today)
         {
-            Console.WriteLine(
-                "Delivery date must be a future date."
-            );
+            Console.WriteLine("Delivery date must be a future date.");
             continue;
         }
 
         break;
     }
 
-    //Console.WriteLine("\nConnecting to external delivery provider...");
     Console.WriteLine($"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM");
 
-    //factory pattern
+    // Factory Pattern - Delivery
     Console.WriteLine("\nSelect Delivery Type:");
     Console.WriteLine("1. Standard Delivery");
     Console.WriteLine("2. Express Delivery");
@@ -638,11 +634,9 @@ void Checkout()
     // Strategy Pattern - Payment
     Payment payment = new Payment(orderCounter, total);
 
-    Console.WriteLine();
+    bool paymentSelected = false;
 
-    bool paymentSuccessful = false;
-
-    while (!paymentSuccessful)
+    while (!paymentSelected)
     {
         Console.WriteLine("\nSelect Payment Method:");
         Console.WriteLine("1. Credit Card");
@@ -662,6 +656,8 @@ void Checkout()
                 payment.SetPaymentStrategy(
                     new CreditCardPayment(cardNumber)
                 );
+
+                paymentSelected = true;
                 break;
 
             case "2":
@@ -671,12 +667,16 @@ void Checkout()
                 payment.SetPaymentStrategy(
                     new PayPalPayment(email)
                 );
+
+                paymentSelected = true;
                 break;
 
             case "3":
                 payment.SetPaymentStrategy(
                     new CashOnDeliveryPayment()
                 );
+
+                paymentSelected = true;
                 break;
 
             case "0":
@@ -684,33 +684,13 @@ void Checkout()
                 return;
 
             default:
-                Console.WriteLine(
-                    "Invalid payment method. Please try again."
-                );
-                continue;
-        }
-
-        Console.WriteLine();
-
-        paymentSuccessful = payment.ProcessPayment();
-
-        if (!paymentSuccessful)
-        {
-            Console.WriteLine();
-            Console.WriteLine(
-                "Please select a payment method and try again."
-            );
+                Console.WriteLine("Invalid payment method. Please try again.");
+                break;
         }
     }
 
-    // Create order
+    // Create Order
     Order newOrder = new Order(orderCounter++);
-    newOrder.SetPayment(payment);
-
-    Delivery delivery = deliveryCreator.CreateDelivery(newOrder.OrderId, address, deliveryDate, $"TRK{newOrder.OrderId}");
-
-    delivery.ScheduleDelivery();
-    newOrder.SetDelivery(delivery);
 
     foreach (var (item, qty) in cart)
     {
@@ -723,9 +703,19 @@ void Checkout()
         );
     }
 
-    newOrder.PlaceOrder();
-    newOrder.MakePayment();
+    // Factory Pattern - Create Delivery
+    Delivery delivery = deliveryCreator.CreateDelivery(newOrder.OrderId, address, deliveryDate, $"TRK{newOrder.OrderId}" );
 
+    // Facade Pattern
+    bool orderPlaced = orderFacade.PlaceOrder(newOrder, payment, delivery);
+
+    if (!orderPlaced)
+    {
+        Console.WriteLine("Checkout was unsuccessful.");
+        return;
+    }
+
+    // Save order
     orderHistory.Insert(0, newOrder);
     lastOrder = newOrder;
 
@@ -737,7 +727,6 @@ void Checkout()
     Console.WriteLine($"Order ID: ORD{newOrder.OrderId}");
     Console.WriteLine($"Total Amount: ${total:N2}");
     Console.WriteLine($"Order Status: {newOrder.Status}");
-
     Console.WriteLine($"Payment Method: {payment.PaymentMethod}");
 
     if (payment.IsCashOnDelivery)
@@ -758,12 +747,14 @@ void Checkout()
 
     Console.WriteLine("================================");
 
-    //save current order
+    // Save current order items for Repeat Order
     lastOrderItems.Clear();
+
     foreach (var item in cart)
     {
         lastOrderItems.Add(item);
     }
+
     cart.Clear();
 }
 
@@ -834,15 +825,11 @@ void ViewOrderDetails()
 
     if (!int.TryParse(input, out int orderId))
     {
-        Console.WriteLine(
-            "Invalid Order ID. Please use a format such as ORD1001."
-        );
+        Console.WriteLine("Invalid Order ID. Please use a format such as ORD1001.");
         return;
     }
 
-    Order? found = orderHistory.FirstOrDefault(
-        o => o.OrderId == orderId
-    );
+    Order? found = orderHistory.FirstOrDefault(o => o.OrderId == orderId);
 
     if (found == null)
     {
@@ -850,49 +837,9 @@ void ViewOrderDetails()
         return;
     }
 
-    Console.WriteLine();
-    Console.WriteLine("=== Order Details ===");
-    Console.WriteLine($"Order ID: ORD{found.OrderId}");
-    Console.WriteLine($"Status:   {found.Status}");
-    Console.WriteLine($"Total:    ${found.TotalAmount:N2}");
-    if (found.Delivery != null)
-    {
-        Console.WriteLine();
-        Console.WriteLine("Delivery Details:");
-        Console.WriteLine($"Delivery Type: {found.Delivery.GetType().Name}");
-        Console.WriteLine($"Address: {found.Delivery.DeliveryAddress}");
-        Console.WriteLine($"Preferred Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
-        Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-        Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-        Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
-    }
+    // Facade Pattern
+    orderFacade.DisplayOrderDetails(found);
 
-
-    if (found.Payment != null)
-    {
-        Console.WriteLine($"Payment Method: {found.Payment.PaymentMethod}");
-        if (found.Payment.IsCashOnDelivery)
-        {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Cash on Delivery - Paid"
-                    : "Payment status: Cash on Delivery - Pending Collection"
-            );
-        }
-        else
-        {
-            Console.WriteLine(
-                found.Payment.IsPaid
-                    ? "Payment status: Paid"
-                    : "Payment status: Not Paid"
-            );
-        }
-
-        if (found.Payment.IsRefunded)
-        {
-            Console.WriteLine("Refund Status: Refunded");
-        }
-    }
     Console.WriteLine();
     Console.WriteLine("What would you like to do?");
     Console.WriteLine("1. Manage This Order");
@@ -906,6 +853,8 @@ void ViewOrderDetails()
         ManageOrder();
     }
 }
+
+
 // ─── Option 6: Repeat Last Order ──────────────────────────────────────
 // command pattern
 void RepeatLastOrder()
@@ -1008,59 +957,17 @@ void ManageOrder()
                 Console.WriteLine("1. Confirm");
                 Console.WriteLine("0. Back");
                 Console.Write("Enter your choice: ");
+
                 string confirm = Console.ReadLine() ?? "";
 
                 if (confirm == "1")
                 {
-                    found.CancelOrder();
-                    if (found.Status == "Cancelled")
-                    {
-                        Console.WriteLine("\nOrder cancelled successfully.");
-
-                        if (found.Payment != null)
-                        {
-                            if (found.Payment.IsPaid)
-                            {
-                                found.Payment.RefundPayment();
-                            }
-                            else if (found.Payment.IsCashOnDelivery)
-                            {
-                                Console.WriteLine(
-                                    "No refund is required because Cash on Delivery has not been collected."
-                                );
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine("\nCancellation unsuccessful.");
-
-                        if (found.Status == "Out for Delivery")
-                        {
-                            Console.WriteLine(
-                                "The order is already out for delivery."
-                            );
-                            Console.WriteLine(
-                                "Cancellation and refund are no longer available."
-                            );
-                        }
-                        else if (found.Status == "Delivered")
-                        {
-                            Console.WriteLine(
-                                "The order has already been delivered and cannot be cancelled."
-                            );
-                        }
-                        else
-                        {
-                            Console.WriteLine(
-                                $"Order cannot be cancelled while its status is {found.Status}."
-                            );
-                        }
-                    }
+                    // Facade Pattern
+                    orderFacade.CancelOrder(found);
                 }
-
                 back = true;
                 break;
+
             case "2":
                 Console.WriteLine($"\n=== Track Delivery ORD{found.OrderId} ===");
 
