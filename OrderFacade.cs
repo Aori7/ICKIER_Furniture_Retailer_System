@@ -34,7 +34,7 @@ namespace ICKIER_Furniture_Retailer_System
         }
 
 
-        // Cancels an order and handles the related refund/delivery update
+        // Cancels an order refunds user
         public bool CancelOrder(Order order)
         {
             if (order == null)

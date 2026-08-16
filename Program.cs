@@ -15,6 +15,11 @@ FurnitureCollection office = new FurnitureCollection(3, "Office Collection", "Of
 FurnitureCollection kitchen = new FurnitureCollection(4, "Kitchen Collection", "Kitchen items");
 FurnitureCollection bathroom = new FurnitureCollection(5, "Bathroom Collection", "Bathroom items");
 
+FurnitureCollection subBedroom = new FurnitureCollection(6,"SubBedroom Collection", "Bedroom Sub-Collection");
+FurnitureCollection subLivingRoom = new FurnitureCollection(7, "SubLivingRoom Collection", "Living Room Sub-Collection");
+FurnitureCollection subOffice = new FurnitureCollection(8, "SubOffice Collection", "Office Sub-Collection");
+FurnitureCollection subKitchen = new FurnitureCollection(9, "SubKitchen Collection", "Kitchen Sub-Collection");
+
 // create material factories; asbtract factory pattern
 FurnitureFactory oakFactory = new OakFurnitureFactory();
 FurnitureFactory pineFactory = new PineFurnitureFactory();
@@ -35,19 +40,22 @@ FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= So
 // adding items into collection
 bedroom.Add(bed1);
 bedroom.Add(bookshelf1);
-bedroom.Add(door1);
+subBedroom.Add(door1);
+bedroom.Add(subBedroom);
 
 livingRoom.Add(table1);
 livingRoom.Add(sofa1);
-livingRoom.Add(chair1);
+subLivingRoom.Add(chair1);
+livingRoom.Add(subLivingRoom);
 
 office.Add(table1);
 office.Add(chair1);
 office.Add(bookshelf1);
-office.Add(door1);
+subOffice.Add(door1);
+office.Add(subOffice);
 
 kitchen.Add(sink1);
-kitchen.Add(stove1);
+subKitchen.Add(stove1);
 
 bathroom.Add(showerHead1);
 bathroom.Add(sink1);
@@ -155,82 +163,147 @@ switch (choice)
 // display and select add ons
 void BrowseFurniture()
 {
-bool back = false;
-while (!back)
-{
-    Console.WriteLine();
-    Console.WriteLine("=== Browse Furniture ===");
-    Console.WriteLine("Select Furniture Collection:");
-    for (int i = 0; i < Catalogue.Count; i++)
-    {
-        Console.WriteLine($"{i + 1}. {Catalogue[i].Name}");
-    }
-    Console.WriteLine("0. Back");
-    Console.Write("Enter your choice: ");
+    bool back = false;
 
-    string input = Console.ReadLine();
-
-    if (input == "0")
+    while (!back)
     {
-        return;
-    }
-    else if (!int.TryParse(input, out int choice))
-    {
-        Console.WriteLine("Please enter a valid number.");
-        continue;
-    }
-    else if (choice < 1 || choice > Catalogue.Count)
-    {
-        Console.WriteLine("Invalid collection.");
-        continue;
-    }
-    else // composite pattern
-    {
-        FurnitureCollection collection = Catalogue[choice - 1];
-
         Console.WriteLine();
-        Console.WriteLine($"=== {collection.Name} ===");
-        int i = 0;
-        foreach (FurnitureItem fi in collection.Children)
+        Console.WriteLine("=== Browse Furniture ===");
+        Console.WriteLine("Select Furniture Collection:");
+
+        for (int i = 0; i < Catalogue.Count; i++)
         {
-            i += 1;
-            Console.WriteLine($"{i}. {fi.Name}");
+            Console.WriteLine($"{i + 1}. {Catalogue[i].Name}");
         }
+
         Console.WriteLine("0. Back");
         Console.Write("Enter your choice: ");
-        string itemIndex = Console.ReadLine();
 
-        if (itemIndex == "0")
+        string input = Console.ReadLine() ?? "";
+
+        if (input == "0")
         {
-            continue;
+            return;
         }
-        else if (!int.TryParse(itemIndex, out int choice2))
+        else if (!int.TryParse(input, out int choice))
         {
             Console.WriteLine("Please enter a valid number.");
             continue;
         }
-        else if (choice2 < 1 || choice2 > collection.Children.Count)
+        else if (choice < 1 || choice > Catalogue.Count)
         {
-            Console.WriteLine("Invalid furniture item.");
+            Console.WriteLine("Invalid collection.");
             continue;
         }
-        else
+
+        FurnitureCollection collection = Catalogue[choice - 1];
+        bool backToCollections = false;
+
+        while (!backToCollections)
         {
-            FurnitureItem item = (FurnitureItem)collection.Children[choice2 - 1];
+            Console.WriteLine();
+            Console.WriteLine($"=== {collection.Name} ===");
+
+            for (int i = 0; i < collection.Children.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {collection.Children[i].Name}");
+            }
+
+            Console.WriteLine("0. Back");
+            Console.Write("Enter your choice: ");
+
+            string itemIndex = Console.ReadLine() ?? "";
+
+            if (itemIndex == "0")
+            {
+                backToCollections = true;
+                continue;
+            }
+            else if (!int.TryParse(itemIndex, out int choice2))
+            {
+                Console.WriteLine("Please enter a valid number.");
+                continue;
+            }
+            else if (choice2 < 1 || choice2 > collection.Children.Count)
+            {
+                Console.WriteLine("Invalid choice.");
+                continue;
+            }
+
+            CatalogComponent selectedChild = collection.Children[choice2 - 1];
+            FurnitureItem item;
+
+            // composite Pattern - subcollection
+            if (selectedChild is FurnitureCollection)
+            {
+                FurnitureCollection subCollection = (FurnitureCollection)selectedChild;
+
+                Console.WriteLine();
+                Console.WriteLine($"=== {subCollection.Name} ===");
+
+                for (int i = 0; i < subCollection.Children.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}. {subCollection.Children[i].Name}");
+                }
+
+                Console.WriteLine("0. Back");
+                Console.Write("Enter your choice: ");
+
+                string subInput = Console.ReadLine() ?? "";
+
+                if (subInput == "0")
+                {
+                    continue;
+                }
+                else if (!int.TryParse(subInput, out int subChoice))
+                {
+                    Console.WriteLine("Please enter a valid number.");
+                    continue;
+                }
+                else if (subChoice < 1 || subChoice > subCollection.Children.Count)
+                {
+                    Console.WriteLine("Invalid choice.");
+                    continue;
+                }
+
+                CatalogComponent subSelected = subCollection.Children[subChoice - 1];
+
+                if (subSelected is FurnitureItem)
+                {
+                    item = (FurnitureItem)subSelected;
+                }
+                else
+                {
+                    Console.WriteLine("Please select a furniture item.");
+                    continue;
+                }
+            }
+            // composite Pattern - item
+            else if (selectedChild is FurnitureItem)
+            {
+                item = (FurnitureItem)selectedChild;
+            }
+            else
+            {
+                Console.WriteLine("Invalid selection.");
+                continue;
+            }
             FurnitureItem selected = item;
 
-            //customisable furnitures; abstract factory pattern
+            // Abstract Factory Pattern - customisable furniture
             if (item.Name == "Table" || item.Name == "Chair" || item.Name == "Bookshelf")
             {
-                Console.WriteLine("\nCustomise Furniture");
+                Console.WriteLine();
+                Console.WriteLine("=== Customise Furniture ===");
                 Console.WriteLine("Choose Furniture Material:");
-                Console.WriteLine("1.Oak");
-                Console.WriteLine("2.Pine");
-                Console.WriteLine("3.Steel");
-                Console.WriteLine("Enter Choice:");
-                string materialChoice = Console.ReadLine() ?? "";
+                Console.WriteLine("1. Oak");
+                Console.WriteLine("2. Pine");
+                Console.WriteLine("3. Steel");
+                Console.Write("Enter choice: ");
 
+                string materialChoice = Console.ReadLine() ?? "";
                 FurnitureFactory fact;
+
                 if (materialChoice == "1")
                 {
                     fact = oakFactory;
@@ -239,7 +312,7 @@ while (!back)
                 {
                     fact = pineFactory;
                 }
-                else if (materialChoice == "3") 
+                else if (materialChoice == "3")
                 {
                     fact = steelFactory;
                 }
@@ -249,28 +322,31 @@ while (!back)
                     continue;
                 }
 
-                //handle dimensions
-                if (item.Name == "Table") //input length,width
+                if (item.Name == "Table")
                 {
                     Console.Write("Enter length (cm): ");
                     double length = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter width (cm): ");
                     double width = Convert.ToDouble(Console.ReadLine());
 
                     selected = fact.CreateTable(length, width);
                 }
-                else if (item.Name == "Chair") //height
+                else if (item.Name == "Chair")
                 {
                     Console.Write("Enter height (cm): ");
                     double height = Convert.ToDouble(Console.ReadLine());
+
                     selected = fact.CreateChair(height);
                 }
-                else if (item.Name == "Bookshelf") //height width shelfcount
+                else if (item.Name == "Bookshelf")
                 {
                     Console.Write("Enter height (cm): ");
                     double height = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter width (cm): ");
                     double width = Convert.ToDouble(Console.ReadLine());
+
                     Console.Write("Enter number of shelves: ");
                     int shelfCount = Convert.ToInt32(Console.ReadLine());
 
@@ -281,22 +357,23 @@ while (!back)
             while (true)
             {
                 Console.WriteLine();
-                Console.WriteLine($"=== {selected.Name} ==="); //print out the customised furniture details
+                Console.WriteLine($"=== {selected.Name} ===");
                 Console.WriteLine($"Price: ${selected.GetPrice():F2}");
                 Console.WriteLine($"Description: {selected.Description}");
-                Console.Write($"Add item to cart? Y/N: ");
-                string decision = Console.ReadLine();
+                Console.Write("Add item to cart? Y/N: ");
+                string decision = (Console.ReadLine() ?? "").ToUpper();
 
-                if (decision.ToUpper() == "N")
+                if (decision == "N")
                 {
-                    break; // goes back to displaying items of selected collection
+                    break;
                 }
-                else if (decision.ToUpper() == "Y")
+                else if (decision == "Y")
                 {
-                    //decorator pattern
+                    // Decorator Pattern
                     while (true)
                     {
-                        Console.WriteLine("\nAdd-ons:");
+                        Console.WriteLine();
+                        Console.WriteLine("=== Add-ons ===");
                         Console.WriteLine("1. Add Warranty (+$49.99)");
                         Console.WriteLine("2. Add Installation (+$79.99)");
                         Console.WriteLine("3. Add Both");
@@ -330,7 +407,6 @@ while (!back)
                     }
 
                     int qty;
-
                     while (true)
                     {
                         Console.Write("Enter quantity: ");
@@ -339,22 +415,20 @@ while (!back)
                         {
                             break;
                         }
-
                         Console.WriteLine("Invalid quantity. Please enter a whole number greater than 0.");
                     }
 
                     cart.Add((selected, qty));
-                    Console.WriteLine($"\n{selected.Name} x{qty} added to cart!");
+                    Console.WriteLine($"{selected.Name} x{qty} added to cart!");
                     return;
                 }
                 else
                 {
-                    Console.WriteLine("Invalid input");
+                    Console.WriteLine("Invalid input. Please enter Y or N.");
                 }
             }
         }
     }
-}
 }
 
 
@@ -367,16 +441,25 @@ void SearchFurniture()
         Console.WriteLine("=== Search Furniture ===");
         Console.WriteLine();
         Console.Write("Which furniture are you looking for? (Enter 0 to go back): ");
+
         string keyword = (Console.ReadLine() ?? "").ToLower();
+
         if (keyword == "0")
         {
             return;
         }
 
-        var results = catalogue.Where(f =>
-        f.Name.ToLower().Contains(keyword) ||
-        f.GetDescription().ToLower().Contains(keyword)).ToList();
+        List<FurnitureItem> allItems = new List<FurnitureItem>();
 
+        foreach (FurnitureCollection collection in Catalogue)
+        {
+            allItems.AddRange(GetAllFurnitureItems(collection));
+        }
+
+        var results = allItems.Where(f =>
+            f.Name.ToLower().Contains(keyword) ||
+            f.GetDescription().ToLower().Contains(keyword)
+        ).ToList();
 
         if (results.Count == 0)
         {
@@ -385,6 +468,7 @@ void SearchFurniture()
         else
         {
             Console.WriteLine($"=== Search Results for \"{keyword}\" ===\n");
+
             for (int i = 0; i < results.Count; i++)
             {
                 Console.WriteLine($"{i + 1}. {results[i].Name}");
@@ -394,6 +478,7 @@ void SearchFurniture()
             }
 
             Console.Write("Enter item number to add to cart (or 0 to search again): ");
+
             string itemChoice = Console.ReadLine() ?? "";
 
             if (itemChoice == "0")
@@ -410,6 +495,8 @@ void SearchFurniture()
                 Console.WriteLine(
                     $"\n{results[itemIdx - 1].Name} x1 added to cart!"
                 );
+
+                return;
             }
             else
             {
@@ -419,7 +506,6 @@ void SearchFurniture()
             }
         }
     }
-
 }
 
 // ─── Option 3: View Cart ──────────────────────────────────────────────
