@@ -10,29 +10,39 @@ namespace ICKIER_Furniture_Retailer_System
     {
         private List<(FurnitureItem item, int qty)> cart;
         private List<(FurnitureItem item, int qty)> lastOrderItems;
+        private List<(FurnitureItem item, int qty)> previousCart;
 
         public RepeatOrderService(List<(FurnitureItem item, int qty)> cart, List<(FurnitureItem item, int qty)> lastOrderItems)
         {
             this.cart = cart;
             this.lastOrderItems = lastOrderItems;
+            previousCart = new List<(FurnitureItem item, int qty)>();
         }
 
         public void RepeatLastOrder()
         {
+            previousCart.Clear();
+            foreach (var item in cart)
+            {
+                previousCart.Add(item);
+            }
             cart.Clear();
 
             foreach (var item in lastOrderItems)
             {
                 cart.Add(item);
             }
-
             Console.WriteLine("Previous order items have been added back to the cart.");
         }
 
         public void CancelRepeatedOrder()
         {
             cart.Clear();
-            Console.WriteLine("Repeated order has been undone.");
+            foreach (var item in previousCart)
+            {
+                cart.Add(item);
+            }
+            Console.WriteLine("Repeated order has been undone. Previous cart restored.");
         }
     }
 }

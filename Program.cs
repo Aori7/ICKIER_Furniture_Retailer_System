@@ -974,13 +974,46 @@ void RepeatLastOrder()
         Console.WriteLine("No previous order found.");
         return;
     }
+    //display
+    Console.WriteLine("==LAST ORDER RECEIPT==");
+    Console.WriteLine($"Order ID: ORD{lastOrder.OrderId}");
+    Console.WriteLine($"Order Status: {lastOrder.Status}");
+    Console.WriteLine();
 
-    Console.WriteLine($"Last Order: ORD{lastOrder.OrderId}");
+    Console.WriteLine("Items:");
+    for (int i = 0; i < lastOrderItems.Count; i++)
+    {
+        FurnitureItem item = lastOrderItems[i].item;
+        int qty = lastOrderItems[i].qty;
+        decimal subtotal = item.GetPrice() * qty;
+
+        Console.WriteLine($"{i + 1}. {item.Name}");
+        Console.WriteLine($"Qty: {qty}");
+        Console.WriteLine($"Unit Price: ${item.GetPrice():N2}");
+        Console.WriteLine($"Subtotal: ${subtotal:N2}");
+    }
+
+    Console.WriteLine();
     Console.WriteLine($"Total: ${lastOrder.TotalAmount:N2}");
+
+    if (lastOrder.Payment != null)
+    {
+        Console.WriteLine($"Payment Method: {lastOrder.Payment.PaymentMethod}");
+    }
+
+    if (lastOrder.Delivery != null)
+    {
+        Console.WriteLine();
+        Console.WriteLine("Delivery Details:");
+        Console.WriteLine($"Delivery Type: {lastOrder.Delivery.GetType().Name}");
+        Console.WriteLine($"Address: {lastOrder.Delivery.DeliveryAddress}");
+        Console.WriteLine($"Delivery Date: {lastOrder.Delivery.ScheduledDate:dd/MM/yyyy}");
+    }
+
+    Console.WriteLine("================================");
     Console.WriteLine("1. Repeat Order");
     Console.WriteLine("0. Back");
     Console.Write("Enter choice: ");
-
     string choice = Console.ReadLine() ?? "";
 
     if (choice == "1")
