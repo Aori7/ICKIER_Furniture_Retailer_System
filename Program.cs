@@ -24,16 +24,16 @@ FurnitureFactory pineFactory = new PineFurnitureFactory();
 FurnitureFactory steelFactory = new SteelFurnitureFactory();
 
 // making items
-FurnitureItem table1 = new FurnitureItem(1, "Table", 2000, "sturdy =material= table");
-FurnitureItem cabinet1 = new FurnitureItem(2, "Cabinet", 3000, "sturdy =material= Cabinet");
-FurnitureItem chair1 = new FurnitureItem(3, "Chair", 500, "sturdy =material= Chair");
-FurnitureItem bookshelf1 = new FurnitureItem(4, "Bookshelf", 2500, "sturdy =material= Bookshelf");
-FurnitureItem showerHead1 = new FurnitureItem(5, "Shower Head", 700, "sturdy Shower Head");
-FurnitureItem sink1 = new FurnitureItem(6, "Sink", 300, "sturdy =material= Sink");
-FurnitureItem stove1 = new FurnitureItem(7, "Stove", 600, "sturdy Stove");
-FurnitureItem door1 = new FurnitureItem(8, "Door", 200, "sturdy =material= Door");
-FurnitureItem bed1 = new FurnitureItem(9, "Bed", 15000, "sturdy =material= Bed");
-FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "sturdy =material= Sofa");
+FurnitureItem table1 = new FurnitureItem(1, "Table", 2000, "Spacious dining table suitable for everyday use.");
+FurnitureItem cabinet1 = new FurnitureItem(2, "Cabinet", 3000, "Storage cabinet with multiple compartments for organised storage.");
+FurnitureItem chair1 = new FurnitureItem(3, "Chair", 500, "Comfortable chair suitable for dining, study or office use.");
+FurnitureItem bookshelf1 = new FurnitureItem(4, "Bookshelf", 2500, "Multi-level bookshelf designed for books, decor and storage.");
+FurnitureItem showerHead1 = new FurnitureItem(5, "Shower Head", 700, "Modern shower head designed for comfortable everyday use.");
+FurnitureItem sink1 = new FurnitureItem(6, "Sink", 300, "Practical sink suitable for kitchen or bathroom use.");
+FurnitureItem stove1 = new FurnitureItem(7, "Stove", 600, "Reliable cooking stove suitable for everyday meal preparation.");
+FurnitureItem door1 = new FurnitureItem(8, "Door", 200, "Simple and durable interior door for residential spaces.");
+FurnitureItem bed1 = new FurnitureItem(9, "Bed", 15000, "Comfortable bed designed for restful sleep and bedroom use.");
+FurnitureItem sofa1 = new FurnitureItem(10, "Sofa", 15000, "Comfortable living room sofa with spacious seating.");
 
 // adding items into collection
 bedroom.Add(bed1);
@@ -105,57 +105,48 @@ int nextPromotionId = 1;
 bool running = true;
 while (running)
 {
+    //main menu display
+    Console.WriteLine("========================================");
+    Console.WriteLine("     WELCOME TO ICKIER FURNITURE STORE");
+    Console.WriteLine("========================================");
+    Console.WriteLine("What would you like to do today?");
+    Console.WriteLine("1. Browse Furniture");
+    Console.WriteLine("2. Search Furniture");
+    Console.WriteLine("3. View Shopping Cart");
+    Console.WriteLine("4. Checkout");
+    Console.WriteLine("5. View Order History");
+    Console.WriteLine("6. Repeat Last Order");
+    Console.WriteLine("7. Manage Brand Subscriptions");
+    Console.WriteLine("8. View Notifications");
+    Console.WriteLine("9. Manage Order");
+    Console.WriteLine("0. Exit");
+    Console.Write("\nEnter your choice: ");
+
+    string choice = Console.ReadLine() ?? "";
   
-Console.WriteLine("========================================");
-Console.WriteLine("     WELCOME TO ICKIER FURNITURE STORE");
-Console.WriteLine("========================================");
-Console.WriteLine("What would you like to do today?");
-Console.WriteLine("1. Browse Furniture");
-Console.WriteLine("2. Search Furniture");
-Console.WriteLine("3. View Shopping Cart");
-Console.WriteLine("4. Checkout");
-Console.WriteLine("5. View Order History");
-Console.WriteLine("6. Repeat Last Order");
-Console.WriteLine("7. Manage Brand Subscriptions");
-Console.WriteLine("8. View Notifications");
-Console.WriteLine("9. Manage Order");
-Console.WriteLine("0. Exit");
-Console.Write("\nEnter your choice: ");
-
-string choice = Console.ReadLine() ?? "";
-  
-
-switch (choice)
-{
-    case "1": BrowseFurniture(); break;
-    case "2": SearchFurniture(); break;
-    case "3": ViewCart(); break;
-    case "4": Checkout(); break;
-    case "5": ViewOrderHistory(); break;
-    case "6": RepeatLastOrder(); break;
-    case "7":
-        ManageBrandSubscriptions();
-        break;
-
-    case "8":
-        customer.ViewNotifications();
-        break;
-
-    case "9":
-        ManageOrder();
-        break;
-    case "0":
-        Console.WriteLine("Hope you enjoy browsing ICKIER!");
-        Console.WriteLine("See you again!");
-        running = false;
-        break;
-    default:
-        Console.WriteLine("Invalid choice. Please try again.");
-        break;
-}
+    switch (choice)
+    {
+        case "1": BrowseFurniture(); break;
+        case "2": SearchFurniture(); break;
+        case "3": ViewCart(); break;
+        case "4": Checkout(); break;
+        case "5": ViewOrderHistory(); break;
+        case "6": RepeatLastOrder(); break;
+        case "7":ManageBrandSubscriptions();break;
+        case "8":customer.ViewNotifications();break;
+        case "9":ManageOrder();break;
+        case "0":
+            Console.WriteLine("Hope you enjoy browsing ICKIER!");
+            Console.WriteLine("See you again!");
+            running = false;
+            break;
+        default:
+            Console.WriteLine("Invalid choice. Please try again.");
+            break;
+    }
 }
 
-// ─── Option 1: Browse Furniture ───────────────────────────────────────
+//  Option 1: Browse Furniture 
 // browse collection & select
 // browse items under collection & select
 // display detials of item & select to add to cart
@@ -292,7 +283,7 @@ void BrowseFurniture()
             }
             FurnitureItem selected = item;
 
-            // Abstract Factory Pattern - customisable furniture
+            // abstract Factory Pattern - customisable furniture
             if (item.Name == "Table" || item.Name == "Chair" || item.Name == "Bookshelf")
             {
                 Console.WriteLine();
@@ -434,7 +425,7 @@ void BrowseFurniture()
 }
 
 
-// ─── Option 2: Search Furniture ───────────────────────────────────────
+// Option 2: Search Furniture
 void SearchFurniture()
 {
     while (true)
@@ -529,7 +520,7 @@ void SearchFurniture()
     }
 }
 
-// ─── Option 3: View Cart ──────────────────────────────────────────────
+// Option 3: View Cart 
 void ViewCart()
 {
     bool back = false;
@@ -637,7 +628,7 @@ void ViewCart()
     }
 }
 
-// ─── Option 4: Checkout ───────────────────────────────────────────────
+// Option 4: Checkout
 void Checkout()
 {
     Console.WriteLine("=== Checkout ===\n");
@@ -707,7 +698,7 @@ void Checkout()
 
     Console.WriteLine($"Delivery slot confirmed: {deliveryDate:dd/MM/yyyy}, 2:00 PM - 5:00 PM");
 
-    // Factory Pattern - Delivery
+    // factory Pattern - Delivery
     Console.WriteLine("\nSelect Delivery Type:");
     Console.WriteLine("1. Standard Delivery");
     Console.WriteLine("2. Express Delivery");
@@ -865,7 +856,7 @@ void Checkout()
     cart.Clear();
 }
 
-// ─── Option 5: View Order History ─────────────────────────────────────
+// Option 5: View Order History 
 void ViewOrderHistory()
 {
     bool back = false;
@@ -962,7 +953,7 @@ void ViewOrderDetails()
 }
 
 
-// ─── Option 6: Repeat Last Order ──────────────────────────────────────
+// Option 6: Repeat Last Order 
 // command pattern
 void RepeatLastOrder()
 {
@@ -1049,7 +1040,7 @@ void RepeatLastOrder()
     }
 }
 
-// ─── Option 9: Manage Order ───────────────────────────────────────────
+// Option 9: Manage Order
 void ManageOrder()
 {
 
@@ -1121,8 +1112,6 @@ void ManageOrder()
                     Console.WriteLine($"Delivery Address: {found.Delivery.DeliveryAddress}");
                     Console.WriteLine($"Expected Delivery Date: {found.Delivery.ScheduledDate:dd/MM/yyyy}");
                     Console.WriteLine("Delivery Slot: 2:00 PM - 5:00 PM");
-                    //Console.WriteLine($"Tracking Number: {found.Delivery.TrackingNumber}");
-                    //Console.WriteLine($"Delivery Status: {found.Delivery.DeliveryStatus}");
                     Console.WriteLine(found.Delivery.TrackDelivery());
                 }
                 else
