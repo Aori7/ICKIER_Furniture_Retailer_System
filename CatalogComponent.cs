@@ -7,19 +7,21 @@ namespace ICKIER_Furniture_Retailer_System
 {
     public abstract class CatalogComponent
     {
-        // does not allow leaf to add children
+        public virtual string Name
+        {
+            get { throw new NotSupportedException(); }
+        }
+
         public virtual void Add(CatalogComponent component)
         {
             throw new NotSupportedException();
         }
 
-        // does not allow leaf to remove children
         public virtual void Remove(CatalogComponent component)
         {
             throw new NotSupportedException();
         }
 
-        // does not allow leaf to get children
         public virtual CatalogComponent GetChild(int index)
         {
             throw new NotSupportedException();

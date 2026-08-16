@@ -1,4 +1,4 @@
-﻿//Christina
+﻿// Christina & Rui Min - Decorator and Composite pattern
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,19 +13,27 @@ namespace ICKIER_Furniture_Retailer_System
         private string name;
         private decimal basePrice;
         private string description;
+        private Brand? brandName;
+        private Promotion? activePromotion;
 
         public int FurnitureId { get { return furnitureId; } set { furnitureId = value; } }
         public string Name { get { return name; } set { name = value; } }
         public decimal BasePrice { get { return basePrice; } set { basePrice = value; } }
         public string Description { get { return description; } set { description = value; } }
 
+        public Brand? BrandName { get { return brandName; } set { brandName = value; } }
 
-        public FurnitureItem(int furnitureId, string name, decimal basePrice, string description)
+        public Promotion? ActivePromotion { get { return activePromotion; } set { activePromotion = value; } }
+
+
+        public FurnitureItem(int furnitureId, string name, decimal basePrice, string description, Brand? brandName = null, Promotion? activePromotion = null)
         {
             this.furnitureId = furnitureId;
             this.name = name;
             this.basePrice = basePrice;
             this.description = description;
+            this.brandName = brandName;
+            this.activePromotion = activePromotion;
         }
 
         public override string GetDescription()
