@@ -100,8 +100,31 @@ new Brand(2, "Nordic Living"),
 new Brand(3, "Urban Oak")
 };
 
-int nextPromotionId = 1;
+// promotions
+Promotion promo1 = new Promotion(1, "National Day Sale", "20% off selected ICKIER Home furniture", 20, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(7));
+Promotion promo2 = new Promotion(2, "Urban Oak Weekend Deal", "15% off selected Urban Oak furniture", 15, DateTime.Now.AddDays(-1), DateTime.Now.AddDays(3));
 
+// adding the brands and promos to the items
+brands[0].AddPromotion(promo1);
+brands[2].AddPromotion(promo2);
+
+table1.BrandName = brands[0];
+cabinet1.BrandName = brands[0];
+chair1.BrandName = brands[1];
+bookshelf1.BrandName = brands[2];
+showerHead1.BrandName = brands[1];
+sink1.BrandName = brands[0];
+stove1.BrandName = brands[2];
+door1.BrandName = brands[1];
+bed1.BrandName = brands[0];
+sofa1.BrandName = brands[2];
+
+table1.ActivePromotion = promo1;
+bed1.ActivePromotion = promo1;
+bookshelf1.ActivePromotion = promo2;
+sofa1.ActivePromotion = promo2;
+
+int nextPromotionId = 1;
 bool running = true;
 while (running)
 {
@@ -119,6 +142,7 @@ while (running)
     Console.WriteLine("7. Manage Brand Subscriptions");
     Console.WriteLine("8. View Notifications");
     Console.WriteLine("9. Manage Order");
+    Console.WriteLine("10. Filter Furniture");
     Console.WriteLine("0. Exit");
     Console.Write("\nEnter your choice: ");
 
@@ -135,6 +159,7 @@ while (running)
         case "7":ManageBrandSubscriptions();break;
         case "8":customer.ViewNotifications();break;
         case "9":ManageOrder();break;
+        case "10":FilterFurniture();break;
         case "0":
             Console.WriteLine("Hope you enjoy browsing ICKIER!");
             Console.WriteLine("See you again!");
@@ -1392,4 +1417,122 @@ void ManageBrandSubscriptions()
         }
 
     } while (observerChoice != "0");
+}
+
+// option 10: filter
+void FilterFurniture()
+{
+    while (true)
+    {
+        Console.WriteLine();
+        Console.WriteLine("=== Filter Furniture ===");
+        Console.WriteLine("1. Filter by Brand");
+        Console.WriteLine("2. Promotion Items Only");
+        Console.WriteLine("3. Filter by Brand and Promotion");
+        Console.WriteLine("0. Back");
+        Console.Write("Enter your choice: ");
+
+        string filterChoice = Console.ReadLine() ?? "";
+        if (filterChoice == "0")
+        {
+            return;
+        }
+
+        Brand? selectedBrand = null;
+        bool promotionOnly = false;
+
+        if (filterChoice == "1" || filterChoice == "3")
+        {
+            Console.WriteLine();
+            Console.WriteLine("Select Brand:");
+
+            for (int i = 0; i < brands.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {brands[i].BrandName}");
+            }
+
+            Console.Write("Enter your choice: ");
+            string brandInput = Console.ReadLine() ?? "";
+
+            int brandChoice;
+            if (!int.TryParse(brandInput, out brandChoice))
+            {
+                Console.WriteLine("Please enter a valid number.");
+                continue;
+            }
+            if (brandChoice < 1 || brandChoice > brands.Count)
+            {
+                Console.WriteLine("Invalid brand.");
+                continue;
+            }
+            selectedBrand = brands[brandChoice - 1];
+        }
+
+        if (filterChoice == "2" || filterChoice == "3")
+        {
+            promotionOnly = true;
+        }
+        if (filterChoice != "1" && filterChoice != "2" && filterChoice != "3")
+        {
+            Console.WriteLine("Invalid choice.");
+            continue;
+        }
+        Console.WriteLine();
+        Console.WriteLine("=== Filter Results ===");
+
+        List<FurnitureItem> filteredItems = new List<FurnitureItem>();
+        foreach (FurnitureCollection collection in Catalogue)
+        {
+            IFurnitureIterator iterator = collection.CreateIterator(selectedBrand, promotionOnly);
+            while (iterator.HasNext())
+            {
+                FurnitureItem item = iterator.Next();
+                filteredItems.Add(item);
+            }
+        }
+
+        if (filteredItems.Count == 0)
+        {
+            Console.WriteLine("No furniture matched the selected filters.");
+            continue;
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("=== Filter Results ===");
+        for (int i = 0; i < filteredItems.Count; i++)
+        {
+            FurnitureItem item = filteredItems[i];
+
+            Console.WriteLine($"{i + 1}. {item.Name}");
+            Console.WriteLine($"   Price: ${item.GetPrice():N2}");
+
+            if (item.BrandName != null)
+            {
+                Console.WriteLine($"   Brand: {item.BrandName.BrandName}");
+            }
+            if (item.ActivePromotion != null && item.ActivePromotion.IsActive())
+            {
+                Console.WriteLine($"   Promotion: {item.ActivePromotion.Title}");
+            }
+            Console.WriteLine();
+        }
+
+        Console.Write("Enter item number to add to cart (or 0 to go back): ");
+        string itemChoice = Console.ReadLine() ?? "";
+
+        if (itemChoice == "0")
+        {
+            return;
+        }
+        if (int.TryParse(itemChoice, out int itemIdx) && itemIdx >= 1 && itemIdx <= filteredItems.Count)
+        {
+            cart.Add((filteredItems[itemIdx - 1], 1));
+            Console.WriteLine($"\n{filteredItems[itemIdx - 1].Name} x1 added to cart!");
+            return;
+        }
+        else
+        {
+            Console.WriteLine($"Invalid item number. Please enter a number from 1 to {filteredItems.Count}, or 0 to go back.");
+        }
+    }
 }

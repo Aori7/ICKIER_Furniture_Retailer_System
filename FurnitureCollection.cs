@@ -31,25 +31,52 @@ namespace ICKIER_Furniture_Retailer_System
         {
             children.Add(component);
         }
+
         // remove collections, sub-collections, items
         public override void Remove(CatalogComponent component)
         {
             children.Remove(component);
         }
+
         // return desc of collection, sub-collection, item
         public override string GetDescription()
         {
             return description;
         }
+
         // return collection, sub-collection, item
         public override CatalogComponent GetChild(int index)
         {
             return children[index];
         }
+
         // return all collections, sub-collections, items
         public List<CatalogComponent> GetChildren()
         {
             return children;
+        }
+
+        // Iterator pattern
+        public IFurnitureIterator CreateIterator(Brand? brand, bool promotionOnly)
+        {
+            List<FurnitureItem> furnitureItems = new List<FurnitureItem>();
+            foreach (CatalogComponent child in children)
+            {
+                if (child is FurnitureItem)
+                {
+                    furnitureItems.Add((FurnitureItem)child);
+                }
+                else if (child is FurnitureCollection)
+                {
+                    FurnitureCollection subCollection = (FurnitureCollection)child;
+                    IFurnitureIterator subIterator = subCollection.CreateIterator(null, false);
+                    while (subIterator.HasNext())
+                    {
+                        furnitureItems.Add(subIterator.Next());
+                    }
+                }
+            }
+            return new FurnitureFilterIterator(furnitureItems, brand, promotionOnly);
         }
     }
 }
